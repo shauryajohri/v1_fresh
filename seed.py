@@ -276,6 +276,33 @@ IMAGE_MAP = {
     # --- Exotic ---
     "Kiwi (कीवी)": "kiwi_baseball.jpg",
     "Blueberry (ब्लूबेरी)": "garlic_conch.jpg",                  # blueberries in basket
+
+    # --- Newly added real photos (2026-07-13) — filenames match the produce ---
+    "Green Amaranth Leaves (हरी चौलाई साग)": "green_amaranth_leaves.png",
+    "Indian Gooseberry / Amla (आंवला)": "amla.png",
+    "Avocado (एवोकाडो)": "avocado.jpeg",
+    "Bathua Greens (बथुआ का साग)": "bathua.png",
+    "Chikoo / Sapota (चीकू)": "chikoo.jpeg",
+    "Cluster Beans / Guar Pods (ग्वार की फली)": "cluster_beans.jpeg",
+    "Drumstick / Sahjan (सहजन)": "drumstick.png",
+    "Green Capsicum / Shimla Mirch (शिमला मिर्च)": "green_capsicum.png",
+    "Guava (अमरूद)": "guava.jpeg",
+    "Jamun (जामुन)": "jamun.png",
+    "Elephant Foot Yam / Jimikand (जिमीकंद)": "jimikand.jpeg",
+    "Jackfruit Raw / Kathal (कटहल)": "kathal.png",
+    "Ladyfinger / Bhindi (भिंडी)": "ladyfinger.png",
+    "Lotus Stem (कमल ककड़ी)": "lotus_stem.png",
+    "Mustard Greens (सरसों का साग)": "mustard_greens.png",
+    "Passion Fruit (पैशन फ्रूट)": "passion_fruit.png",
+    "Malabar Spinach / Poi Greens (पोई का साग)": "poi_greens.png",
+    "Purple Yam / Ratalu (रतालू)": "purple_yam.png",
+    "Raw Papaya (कच्चा पपीता)": "raw_papaya.png",
+    "Strawberry (स्ट्रॉबेरी)": "strawberry.jpeg",
+    "Water Chestnut / Singhada (सिंघाड़ा)": "water_chestnut.png",
+    "Water Spinach / Karmi Saag (करमी का साग)": "water_spinach.png",
+    "Cowpea Beans / Yardlong Beans (लोबिया की फली)": "yardlong_beans.png",
+    "Colocasia / Taro Root / Arbi (अरबी)": "arbi.jpg",
+    "Mushroom Button (मशरूम)": "mushroom.png",
 }
 
 
