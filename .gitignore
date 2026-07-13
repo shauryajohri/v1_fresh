@@ -8,6 +8,8 @@ __pycache__/
 # Database
 *.db
 *.db.bak
+# ...but DO ship the pre-seeded catalog DB — the read-only Vercel demo needs it.
+!v1fresh.db
 
 # IDE
 .idea/

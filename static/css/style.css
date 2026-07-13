@@ -173,6 +173,19 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 .topbar-locate:disabled { opacity: 0.6; cursor: default; }
 .topbar-locate svg { flex-shrink: 0; }
 
+/* Logged-in Google user chip in the navbar */
+.nav-user { display: inline-flex; align-items: center; gap: 8px; }
+.nav-user-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    object-fit: cover; border: 2px solid var(--green-100, #dcfce7);
+}
+.nav-user-name { font-weight: 600; font-size: 0.9rem; color: var(--white); }
+.nav-user-logout {
+    font-size: 0.82rem; font-weight: 600; color: var(--white);
+    text-decoration: underline; opacity: 0.9;
+}
+.nav-user-logout:hover { opacity: 1; }
+
 .navbar { background: var(--green-600); border-bottom: 1px solid var(--green-700); }
 .navbar { background: var(--green-600); border-bottom: 1px solid var(--green-700); }
 .navbar-inner {

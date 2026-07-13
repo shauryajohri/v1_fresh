@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+from werkzeug.middleware.proxy_fix import ProxyFix
 from config import Config
 from extensions import db
 from models import weight_options_for
@@ -8,8 +9,16 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
+    # Behind Vercel's proxy — trust X-Forwarded-* so url_for(_external) builds
+    # correct https URLs (needed for the Google OAuth redirect URI).
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
     db.init_app(app)
     app.jinja_env.globals["weight_options_for"] = weight_options_for
+
+    # Google OAuth (session-based login)
+    from routes.auth import auth_bp, init_oauth
+    init_oauth(app)
 
     # Register blueprints
     from routes.main import main_bp
@@ -23,6 +32,7 @@ def create_app():
     app.register_blueprint(cart_bp)
     app.register_blueprint(orders_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(auth_bp)
 
     # Make cart count available in every template without repeating queries everywhere.
     # No accounts in this build, so the cart lives entirely in the Flask session
@@ -34,6 +44,8 @@ def create_app():
         return {
             "cart_count": sum(guest_cart.values()),
             "free_delivery_threshold": Config.FREE_DELIVERY_THRESHOLD,
+            # Signed-in Google user (or None) — available in every template.
+            "current_user": session.get("user"),
         }
 
     @app.errorhandler(404)
