@@ -549,21 +549,15 @@ a:focus-visible, button:focus-visible, input:focus-visible {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 10px;
+    margin: 0 auto 14px;
+    min-height: 56px;
 }
 .category-card-emoji {
-    font-size: 3.4rem;
+    font-size: 2.9rem;
     line-height: 1;
     display: block;
-}.category-card-img {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 14px;
-    overflow: hidden;
-    max-width: 72px;
 }
-.category-card-img img { width: 100%; height: 100%; object-fit: contain; }
+.category-card-img img { width: 100%; height: 100%; object-fit: contain; max-width: 72px; }
 .category-card span { font-weight: 600; font-size: 0.9rem; color: var(--green-900); }
 
 /* ===========================================
