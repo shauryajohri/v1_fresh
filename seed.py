@@ -6,6 +6,7 @@ Order data is intentionally left empty — orders are created only through check
 from app import create_app
 from extensions import db
 from models import Category, Product
+from descriptions import DESCRIPTIONS
 
 app = create_app()
 
@@ -44,7 +45,6 @@ CATEGORIES = [
     {"name": "Vegetables", "slug": "vegetables", "image": "/static/images/cat-vegetables.svg", "sort_order": 2},
     {"name": "Leafy Greens", "slug": "leafy-greens", "image": "/static/images/cat-leafy.svg", "sort_order": 3},
     {"name": "Exotic", "slug": "exotic", "image": "/static/images/cat-exotic.svg", "sort_order": 4},
-    {"name": "Combo Packs", "slug": "combo-packs", "image": "/static/images/cat-combo.svg", "sort_order": 5},
     {"name": "Dairy & Eggs", "slug": "dairy-eggs", "image": "/static/images/cat-dairy.svg", "sort_order": 6},
 ]
 
@@ -163,14 +163,6 @@ PRODUCTS = PRODUCTS = [
     {"name": "Pomegranate / Anaar (अनार)", "category": "fruits", "price": 160, "mrp": 200, "unit": "kg", "rating": 4.7, "featured": True},
     {"name": "Dragon Fruit (ड्रैगन फ्रूट)", "category": "exotic", "price": 180, "mrp": 220, "unit": "piece", "rating": 4.5},
     {"name": "Normal Potato / Aloo (आलू)", "category": "vegetables", "price": 28, "mrp": 36, "unit": "kg", "rating": 4.1, "featured": True},
-
-    # Combo Packs
-    {"name": "Daily Veg Combo (5 items)", "category": "combo-packs", "price": 199, "mrp": 250, "unit": "pack", "rating": 4.6, "featured": True},
-    {"name": "Fruit Basket (Mixed, 2kg)", "category": "combo-packs", "price": 349, "mrp": 420, "unit": "pack", "rating": 4.7, "featured": True},
-    {"name": "Salad Special Combo", "category": "combo-packs", "price": 159, "mrp": 199, "unit": "pack", "rating": 4.4},
-    {"name": "Curry Essentials Combo", "category": "combo-packs", "price": 129, "mrp": 165, "unit": "pack", "rating": 4.3},
-    {"name": "Green Leafy Combo (4 items)", "category": "combo-packs", "price": 89, "mrp": 120, "unit": "pack", "rating": 4.5},
-    {"name": "Exotic Picks Combo", "category": "combo-packs", "price": 299, "mrp": 380, "unit": "pack", "rating": 4.6, "featured": True},
 ]
 
 
@@ -346,7 +338,10 @@ def seed():
                 mrp=p.get("mrp"),
                 unit=p["unit"],
                 image=resolve_image(p["name"]),
-                description=f"Fresh {p['name'].split('(')[0].strip()}, sourced same morning and quality-checked before dispatch.",
+                description=DESCRIPTIONS.get(
+                    p["name"],
+                    f"Fresh {p['name'].split('(')[0].strip()}, sourced same morning and quality-checked before dispatch.",
+                ),
                 stock=100,
                 is_featured=p.get("featured", False),
                 is_organic=p.get("organic", False),

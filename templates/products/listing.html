@@ -24,6 +24,21 @@
                 </li>
                 {% endfor %}
             </ul>
+
+            <h3 class="season-filter-heading">Price Range</h3>
+            <div class="price-range">
+                <input type="range" id="priceRange" min="0" max="1000" value="1000" step="10">
+                <div class="price-range-labels">
+                    <span>₹0</span>
+                    <span id="priceMaxLabel">₹1000</span>
+                </div>
+            </div>
+
+            <h3 class="season-filter-heading">Filters</h3>
+            <div class="sidebar-filters">
+                <label class="filter-check"><input type="checkbox" id="filterOrganic"> Organic Only</label>
+                <label class="filter-check"><input type="checkbox" id="filterStock"> In Stock Only</label>
+            </div>
         </aside>
 
         <div class="listing-main">
@@ -45,7 +60,11 @@
             {% if products %}
             <div class="product-grid" id="productGrid">
                 {% for product in products %}
-                <div class="product-card-wrapper" data-name="{{ product.name | lower }}">
+                <div class="product-card-wrapper"
+                     data-name="{{ product.name | lower }}"
+                     data-price="{{ product.price }}"
+                     data-organic="{{ 1 if product.is_organic else 0 }}"
+                     data-stock="{{ 1 if product.in_stock else 0 }}">
                     {% include "partials/_product_card.html" %}
                 </div>
                 {% endfor %}
@@ -66,45 +85,7 @@
     </div>
 </section>
 
-<section class="why-choose">
-    <div class="container">
-        <h2 class="why-choose-title">Why Choose v1fresh?</h2>
-        <p class="why-choose-subtitle">Loved by families across Noida &amp; Greater Noida</p>
-        <div class="why-choose-grid">
-            <div class="why-choose-card">
-                <span class="why-choose-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="7" width="15" height="10" rx="1"/><path d="M16 10h3l3 3v4h-6z"/><circle cx="6" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></svg>
-                </span>
-                <div class="why-choose-text">
-                    <h3>Free Delivery</h3>
-                    <p>On orders above ₹{{ free_delivery_threshold }}</p>
-                </div>
-            </div>
-            <div class="why-choose-card">
-                <span class="why-choose-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 5v6c0 5.5 3.5 9.7 8 11 4.5-1.3 8-5.5 8-11V5z"/></svg>
-                </span>
-                <div class="why-choose-text">
-                    <h3>Premium Quality</h3>
-                    <p>100% fresh, handpicked daily</p>
-                </div>
-            </div>
-            <div class="why-choose-card">
-                <span class="why-choose-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-                </span>
-                <div class="why-choose-text">
-                    <h3>Flexible Slots</h3>
-                    <p>Morning &amp; evening delivery</p>
-                </div>
-            </div>
-        </div>
-        <div class="why-choose-rating">
-            <span class="why-choose-stars">★★★★★</span>
-            <strong>4.8</strong> · Rated by happy customers
-        </div>
-    </div>
-</section>
+{% include "partials/_why_choose.html" %}
 {% endblock %}
 
 {% block extra_scripts %}
@@ -113,6 +94,10 @@ const searchInput = document.getElementById('liveSearch');
 const grid = document.getElementById('productGrid');
 const countEl = document.getElementById('resultCount');
 const noResults = document.getElementById('noResults');
+const priceRange = document.getElementById('priceRange');
+const priceMaxLabel = document.getElementById('priceMaxLabel');
+const filterOrganic = document.getElementById('filterOrganic');
+const filterStock = document.getElementById('filterStock');
 
 function highlight(text, query) {
     if (!query) return text;
@@ -120,36 +105,53 @@ function highlight(text, query) {
     return text.replace(new RegExp('(' + escaped + ')', 'gi'), '<mark>$1</mark>');
 }
 
-if (searchInput && grid) {
-    searchInput.addEventListener('input', () => {
-        const q = searchInput.value.trim().toLowerCase();
-        const wrappers = grid.querySelectorAll('.product-card-wrapper');
-        let visible = 0;
+function applyFilters() {
+    if (!grid) return;
+    const q = searchInput ? searchInput.value.trim().toLowerCase() : '';
+    const maxPrice = priceRange ? parseFloat(priceRange.value) : Infinity;
+    const organicOnly = filterOrganic ? filterOrganic.checked : false;
+    const stockOnly = filterStock ? filterStock.checked : false;
+    let visible = 0;
 
-        wrappers.forEach(wrapper => {
-            const name = wrapper.dataset.name;
-            const nameEl = wrapper.querySelector('.product-card-name');
-            if (!nameEl.dataset.original) {
-                nameEl.dataset.original = nameEl.textContent;
-            }
-            const original = nameEl.dataset.original;
+    grid.querySelectorAll('.product-card-wrapper').forEach(wrapper => {
+        const name = wrapper.dataset.name || '';
+        const price = parseFloat(wrapper.dataset.price || '0');
+        const isOrganic = wrapper.dataset.organic === '1';
+        const inStock = wrapper.dataset.stock === '1';
 
-            if (!q || name.includes(q)) {
-                wrapper.style.display = '';
-                nameEl.innerHTML = highlight(original, q);
-                visible++;
-            } else {
-                wrapper.style.display = 'none';
-            }
-        });
+        const nameEl = wrapper.querySelector('.product-card-name');
+        if (nameEl && !nameEl.dataset.original) {
+            nameEl.dataset.original = nameEl.textContent;
+        }
 
-        countEl.textContent = visible + ' products';
-        noResults.style.display = visible === 0 ? '' : 'none';
+        const matches =
+            (!q || name.includes(q)) &&
+            (price <= maxPrice) &&
+            (!organicOnly || isOrganic) &&
+            (!stockOnly || inStock);
+
+        if (matches) {
+            wrapper.style.display = '';
+            if (nameEl) nameEl.innerHTML = highlight(nameEl.dataset.original, q);
+            visible++;
+        } else {
+            wrapper.style.display = 'none';
+        }
     });
 
-    if (searchInput.value) {
-        searchInput.dispatchEvent(new Event('input'));
-    }
+    if (countEl) countEl.textContent = visible + ' products';
+    if (noResults) noResults.style.display = visible === 0 ? '' : 'none';
 }
+
+if (searchInput) searchInput.addEventListener('input', applyFilters);
+if (priceRange) priceRange.addEventListener('input', () => {
+    if (priceMaxLabel) priceMaxLabel.textContent = '₹' + priceRange.value;
+    applyFilters();
+});
+if (filterOrganic) filterOrganic.addEventListener('change', applyFilters);
+if (filterStock) filterStock.addEventListener('change', applyFilters);
+
+// Run once on load to respect any pre-filled search term.
+applyFilters();
 </script>
 {% endblock %}

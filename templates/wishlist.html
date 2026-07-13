@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}My Wishlist - v1fresh{% endblock %}
+
+{% block content %}
+<section class="wishlist-page container">
+    <div class="wishlist-header">
+        <span class="wishlist-header-icon">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                <path d="M12 21s-6.7-4.35-9.3-8.1C.8 10 1.4 6.4 4.6 5 7 4 9.6 4.9 12 7.6 14.4 4.9 17 4 19.4 5c3.2 1.4 3.8 5 1.9 7.9C18.7 16.65 12 21 12 21z"/>
+            </svg>
+        </span>
+        <div>
+            <h1>My Wishlist</h1>
+            <p>Tap the heart on any product to save it here</p>
+        </div>
+    </div>
+
+    <div class="product-grid" id="wishlistGrid" style="display:none;"></div>
+
+    <div class="wishlist-empty" id="wishlistEmpty">
+        <span class="wishlist-empty-icon">
+            <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M12 21s-6.7-4.35-9.3-8.1C.8 10 1.4 6.4 4.6 5 7 4 9.6 4.9 12 7.6 14.4 4.9 17 4 19.4 5c3.2 1.4 3.8 5 1.9 7.9C18.7 16.65 12 21 12 21z"/>
+            </svg>
+        </span>
+        <h2>Your wishlist is empty</h2>
+        <p>Save fresh fruits, vegetables, and seasonal specials here. Tap the heart icon on any product and it'll land in this list.</p>
+        <a href="{{ url_for('products.listing') }}" class="wishlist-browse-btn">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Browse products
+        </a>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    const grid = document.getElementById('wishlistGrid');
+    const empty = document.getElementById('wishlistEmpty');
+
+    function readIds() {
+        try { return JSON.parse(localStorage.getItem('v1fresh_wishlist') || '[]'); }
+        catch (e) { return []; }
+    }
+
+    function showEmpty() { grid.style.display = 'none'; empty.style.display = ''; }
+    function showGrid() { grid.style.display = ''; empty.style.display = 'none'; }
+
+    const ids = readIds();
+    if (!ids.length) { showEmpty(); return; }
+
+    fetch('/wishlist/cards?ids=' + encodeURIComponent(ids.join(',')))
+        .then(function (r) { return r.text(); })
+        .then(function (html) {
+            grid.innerHTML = html;
+            if (grid.children.length) {
+                showGrid();
+                // every card here is already saved — fill its heart
+                grid.querySelectorAll("[data-action='wishlist']").forEach(function (h) {
+                    h.classList.add('is-active');
+                });
+            } else {
+                showEmpty();
+            }
+        })
+        .catch(function () { showEmpty(); });
+
+    // When a heart is un-toggled on this page, drop the card from the list.
+    grid.addEventListener('click', function (e) {
+        const btn = e.target.closest("[data-action='wishlist']");
+        if (!btn) return;
+        setTimeout(function () {
+            if (!btn.classList.contains('is-active')) {
+                const wrapper = btn.closest('.product-card-wrapper');
+                if (wrapper) wrapper.remove();
+                if (!grid.children.length) showEmpty();
+            }
+        }, 0);
+    });
+})();
+</script>
+{% endblock %}

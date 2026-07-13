@@ -21,7 +21,10 @@
         </div>
 
         <div class="product-detail-info">
-            {% if product.is_organic %}<span class="badge-pill badge-pill-organic">Organic</span>{% endif %}
+            <div class="detail-badge-row">
+                {% if product.is_organic %}<span class="badge-pill badge-pill-organic">Organic</span>{% endif %}
+                {% if product.season and product.season != 'all-season' %}<span class="badge-pill badge-pill-seasonal">Seasonal</span>{% endif %}
+            </div>
 
             <h1>{{ base_name }}</h1>
             {% if hindi_name %}<p class="product-detail-hindi">{{ hindi_name }}</p>{% endif %}
@@ -49,15 +52,23 @@
 {% endif %}
 
 <div class="detail-price-box" data-base-price="{{ product.price }}">
-    <span class="price-large" data-role="detail-price">₹{{ "%.0f"|format(product.price * weight_chips[0][1]) }}</span>
+    <div class="detail-price-main">
+        <span class="price-large" data-role="detail-price">₹{{ "%.0f"|format(product.price * weight_chips[0][1]) }}</span>
+        {% if product.mrp and product.mrp > product.price %}
+        <span class="mrp" data-role="detail-mrp">₹{{ "%.0f"|format(product.mrp * weight_chips[0][1]) }}</span>
+        <span class="badge-discount-inline">{{ product.discount_percent }}% OFF</span>
+        {% endif %}
+        <span class="per-unit" data-role="detail-per-unit">/ {{ weight_chips[0][0] }}</span>
+    </div>
     {% if product.mrp and product.mrp > product.price %}
-    <span class="mrp" data-role="detail-mrp">₹{{ "%.0f"|format(product.mrp * weight_chips[0][1]) }}</span>
-    <span class="badge-discount-inline">{{ product.discount_percent }}% OFF</span>
+    <span class="detail-savings" data-role="detail-savings">You save ₹{{ "%.2f"|format((product.mrp - product.price) * weight_chips[0][1]) }}</span>
     {% endif %}
-    <span class="per-unit" data-role="detail-per-unit">/ {{ weight_chips[0][0] }}</span>
 </div>
 
-<p class="product-description">{{ product.description or "Fresh, hand-picked, and delivered same day." }}</p>
+<div class="product-description-block">
+    <h3 class="product-description-title">Product Description</h3>
+    <p class="product-description">{{ product.description or "Fresh, hand-picked, and delivered same day." }}</p>
+</div>
 
 {% if product.in_stock %}
 <div class="detail-qty-section">

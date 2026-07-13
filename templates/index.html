@@ -85,7 +85,6 @@
                 'vegetables': '🥬',
                 'leafy-greens': '🌿',
                 'exotic': '🥑',
-                'combo-packs': '📦',
                 'dairy-eggs': '🥚'
             } %}
             {% for cat in categories %}
@@ -120,4 +119,25 @@
     </div>
 </section>
 {% endfor %}
+
+{% if featured_products %}
+<section class="featured-section">
+    <div class="container">
+        <div class="section-heading">
+            <div>
+                <h2>⭐ Featured Products</h2>
+                <p class="section-subtitle">Our most-loved picks this week</p>
+            </div>
+            <a href="{{ url_for('products.listing') }}" class="see-all">Shop all →</a>
+        </div>
+        <div class="product-grid product-grid-compact">
+            {% for product in featured_products %}
+                {% include "partials/_product_card.html" %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% include "partials/_why_choose.html" %}
 {% endblock %}

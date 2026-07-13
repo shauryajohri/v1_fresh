@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Sign In - v1fresh{% endblock %}
+{% block body_class %}auth-body{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+    <a href="{{ url_for('main.home') }}" class="auth-logo">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="V1 Fresh - Premium Quality Wholesale Price">
+    </a>
+
+    <div class="auth-card">
+        <h1 class="auth-title">Sign in with SMS OTP</h1>
+        <p class="auth-subtitle">We'll send a one-time code via SMS</p>
+
+        <form class="auth-form" data-demo-method="SMS OTP">
+            <div class="auth-input">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.61 21 3 13.39 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.58a1 1 0 0 1-.25 1.02z"/></svg>
+                <span class="auth-input-prefix">+91</span>
+                <input type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number" autocomplete="tel">
+            </div>
+            <div class="auth-input">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <input type="text" placeholder="Full name (required for new users)" autocomplete="name">
+            </div>
+            <button type="submit" class="auth-btn auth-btn-blue">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+                Send OTP via SMS
+            </button>
+            <p class="auth-hint">A 6-digit OTP will be sent to this number via SMS.</p>
+        </form>
+
+        <div class="auth-divider"><span>OR CONTINUE WITH</span></div>
+
+        <a href="https://wa.me/919643551177" target="_blank" rel="noopener" class="auth-btn auth-btn-whatsapp" data-demo-method="WhatsApp">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm4.5 12.1c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.6.8-.8 1-.1.2-.3.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.2 0-.4.1-.5l.4-.4c.1-.1.2-.3.2-.4 0-.1 0-.3 0-.4-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.4c.1.2 1.6 2.4 3.8 3.4.5.2.9.4 1.3.5.5.2 1 .1 1.4.1.4-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1-.1-.1-.2-.1-.4-.2z"/></svg>
+            Continue with WhatsApp
+        </a>
+
+        <button type="button" class="auth-btn auth-btn-outline" data-demo-method="Email & Password">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+            Use Email &amp; Password
+        </button>
+
+        <a href="{{ url_for('auth.google_login') }}" class="auth-btn auth-btn-outline auth-btn-google">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15A10.5 10.5 0 0 0 12 1 11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38z"/></svg>
+            Continue with Google
+        </a>
+
+        <div class="auth-note" id="authNote" hidden></div>
+
+        <hr class="auth-rule">
+        <p class="auth-terms">By continuing, you agree to our
+            <a href="{{ url_for('main.terms_conditions') }}">Terms</a> and
+            <a href="{{ url_for('main.privacy_policy') }}">Privacy Policy</a>
+        </p>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Only Google sign-in is wired to a backend. The other options are shown for
+// the intended design; tell the user politely until an SMS/email service is added.
+(function () {
+    const note = document.getElementById('authNote');
+    function showNote(method) {
+        if (!note) return;
+        note.textContent = method + " sign-in isn't set up yet — please continue with Google for now.";
+        note.hidden = false;
+    }
+    document.querySelectorAll('[data-demo-method]').forEach(function (el) {
+        el.addEventListener(el.tagName === 'FORM' ? 'submit' : 'click', function (e) {
+            e.preventDefault();
+            showNote(el.getAttribute('data-demo-method'));
+        });
+    });
+})();
+</script>
+{% endblock %}

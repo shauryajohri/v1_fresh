@@ -1,8 +1,10 @@
 <div class="product-card" data-product-id="{{ product.id }}">
-    {% if product.is_organic %}
-    <span class="badge badge-organic">Organic</span>
-    {% elif product.discount_percent > 0 %}
-    <span class="badge badge-discount">{{ product.discount_percent }}% OFF</span>
+    {% if product.discount_percent > 0 or product.is_organic or (product.season and product.season != 'all-season') %}
+    <div class="card-badges">
+        {% if product.discount_percent > 0 %}<span class="badge badge-discount">{{ product.discount_percent }}% OFF</span>{% endif %}
+        {% if product.is_organic %}<span class="badge badge-organic">Organic</span>{% endif %}
+        {% if product.season and product.season != 'all-season' %}<span class="badge badge-seasonal">Seasonal</span>{% endif %}
+    </div>
     {% endif %}
 
     <button class="card-wishlist" type="button" data-action="wishlist" aria-label="Add to wishlist">

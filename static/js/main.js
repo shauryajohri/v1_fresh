@@ -146,11 +146,48 @@ if (topbarEl) {
         }
     });
 
-    // ── Wishlist heart + weight-chip selector (decorative, front-end only) ──
+    // ── Wishlist (persisted in localStorage) ───────────────────────────
+    function getWishlist() {
+        try { return JSON.parse(localStorage.getItem("v1fresh_wishlist") || "[]"); }
+        catch (e) { return []; }
+    }
+    function saveWishlist(ids) {
+        try { localStorage.setItem("v1fresh_wishlist", JSON.stringify(ids)); } catch (e) {}
+        const badge = document.getElementById("wishlistBadge");
+        if (badge) {
+            badge.textContent = ids.length;
+            badge.style.display = ids.length ? "" : "none";
+        }
+    }
+    // Restore heart state + badge on every page load.
+    (function restoreWishlist() {
+        const ids = getWishlist();
+        document.querySelectorAll(".product-card[data-product-id]").forEach((card) => {
+            if (ids.includes(card.dataset.productId)) {
+                const heart = card.querySelector("[data-action='wishlist']");
+                if (heart) heart.classList.add("is-active");
+            }
+        });
+        saveWishlist(ids); // syncs the badge
+    })();
+
+    // ── Wishlist heart toggle + weight-chip selector ──
     document.body.addEventListener("click", (e) => {
         const wishlistBtn = e.target.closest("[data-action='wishlist']");
         if (wishlistBtn) {
-            wishlistBtn.classList.toggle("is-active");
+            const card = wishlistBtn.closest(".product-card");
+            const id = card ? card.dataset.productId : null;
+            if (id) {
+                let ids = getWishlist();
+                if (ids.includes(id)) {
+                    ids = ids.filter((x) => x !== id);
+                    wishlistBtn.classList.remove("is-active");
+                } else {
+                    ids.push(id);
+                    wishlistBtn.classList.add("is-active");
+                }
+                saveWishlist(ids);
+            }
             return;
         }
 
@@ -193,6 +230,10 @@ if (topbarEl) {
             }
             if (mrpEl && !isNaN(baseMrp) && !isNaN(fraction)) {
                 mrpEl.textContent = "₹" + Math.round(baseMrp * fraction);
+            }
+            const savingsEl = info.querySelector("[data-role='detail-savings']");
+            if (savingsEl && !isNaN(baseMrp) && !isNaN(basePrice) && !isNaN(fraction)) {
+                savingsEl.textContent = "You save ₹" + ((baseMrp - basePrice) * fraction).toFixed(2);
             }
             if (perUnitEl) {
                 perUnitEl.textContent = "/ " + label;
@@ -316,48 +357,57 @@ if (topbarEl) {
     } catch (e) { /* storage unavailable — ignore */ }
 
     if (locateBtn && locationLabel) {
+        const flash = (msg, revertTo, ms) => {
+            locationLabel.textContent = msg;
+            setTimeout(() => {
+                if (locationLabel.textContent === msg) locationLabel.textContent = revertTo;
+            }, ms || 3500);
+        };
+
         locateBtn.addEventListener("click", () => {
+            const original = locationLabel.textContent;
+
             if (!("geolocation" in navigator)) {
-                locationLabel.textContent = "Location not supported";
+                flash("Location not supported", original);
                 return;
             }
-            const original = locationLabel.textContent;
+            // Browsers only allow geolocation on https:// or localhost.
+            if (window.isSecureContext === false) {
+                flash("Open on https/localhost", original, 4500);
+                return;
+            }
+
             locationLabel.textContent = "Detecting…";
             locateBtn.disabled = true;
 
             navigator.geolocation.getCurrentPosition(async (pos) => {
                 const { latitude, longitude } = pos.coords;
+                let label = "Your location";
                 try {
                     const res = await fetch(
                         `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
                     );
-                    const data = await res.json();
-                    const area =
-                        data.locality ||
-                        data.city ||
-                        data.principalSubdivision ||
-                        "";
-                    const region = data.principalSubdivision || "";
-                    const label = area
-                        ? (region && region !== area ? `${area}, ${region}` : area)
-                        : "Your location";
-                    locationLabel.textContent = label;
-                    try { localStorage.setItem("v1fresh_location", label); } catch (e) {}
-                } catch (err) {
-                    locationLabel.textContent = original;
-                } finally {
-                    locateBtn.disabled = false;
-                }
-            }, (err) => {
-                locationLabel.textContent =
-                    err.code === err.PERMISSION_DENIED ? "Location blocked" : original;
-                locateBtn.disabled = false;
-                setTimeout(() => {
-                    if (locationLabel.textContent === "Location blocked") {
-                        locationLabel.textContent = original;
+                    if (res.ok) {
+                        const data = await res.json();
+                        const area = data.locality || data.city || data.principalSubdivision || "";
+                        const region = data.principalSubdivision || "";
+                        if (area) label = (region && region !== area) ? `${area}, ${region}` : area;
                     }
-                }, 2500);
-            }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
+                } catch (e) {
+                    // We still have the coordinates even if the area lookup fails.
+                    label = latitude.toFixed(2) + ", " + longitude.toFixed(2);
+                }
+                locationLabel.textContent = label;
+                try { localStorage.setItem("v1fresh_location", label); } catch (e) {}
+                locateBtn.disabled = false;
+            }, (err) => {
+                locateBtn.disabled = false;
+                let msg = "Couldn't get location";
+                if (err.code === err.PERMISSION_DENIED) msg = "Allow location access";
+                else if (err.code === err.POSITION_UNAVAILABLE) msg = "Turn on device location";
+                else if (err.code === err.TIMEOUT) msg = "Timed out — try again";
+                flash(msg, original, 4500);
+            }, { enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 });
         });
     }
 

@@ -7,7 +7,7 @@ gate any "my account" features. Swap to a User table if you later move to a
 persistent database.
 """
 import os
-from flask import Blueprint, redirect, url_for, session, flash, current_app
+from flask import Blueprint, redirect, url_for, session, flash, current_app, render_template
 from authlib.integrations.flask_client import OAuth
 
 auth_bp = Blueprint("auth", __name__)
@@ -29,9 +29,17 @@ def init_oauth(app):
 
 @auth_bp.route("/login")
 def login():
+    """The sign-in page with all the options. Google is the one that fully works;
+    the SMS/WhatsApp/Email options are on the page but need external services."""
+    return render_template("login.html")
+
+
+@auth_bp.route("/login/google")
+def google_login():
+    """Kick off the Google OAuth flow."""
     if not current_app.config.get("GOOGLE_CLIENT_ID"):
         flash("Google login isn't configured yet (missing GOOGLE_CLIENT_ID).", "error")
-        return redirect(url_for("main.home"))
+        return redirect(url_for("auth.login"))
     redirect_uri = url_for("auth.callback", _external=True)
     return oauth.google.authorize_redirect(redirect_uri)
 

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, Response
+from flask import Blueprint, render_template, Response, request
 from models import Category, Product, current_season
 
 main_bp = Blueprint("main", __name__)
@@ -11,9 +11,11 @@ CATEGORY_SPOTLIGHT_SUBTITLES = {
     "fruits": "Farm-fresh fruits picked at peak ripeness",
     "leafy-greens": "Crisp greens, harvested same day",
     "exotic": "Exotic picks for your everyday cooking",
-    "combo-packs": "Curated combos, priced to save you more",
     "dairy-eggs": "Fresh dairy and eggs delivered daily",
 }
+
+# Homepage spotlight sections, in the order they appear below "Shop by Category".
+SPOTLIGHT_ORDER = ["vegetables", "fruits"]
 
 
 @main_bp.route("/")
@@ -33,10 +35,15 @@ def home():
         .all()
     )
 
-    # One "spotlight" per category, right after Shop by Category, each
-    # showing up to 6 products from that category.
+    # Spotlight sections right after "Shop by Category" — Fresh Vegetables,
+    # then Fresh Fruits (see SPOTLIGHT_ORDER). "Featured Products" is rendered
+    # separately below these in the template.
+    cats_by_slug = {c.slug: c for c in categories}
     category_spotlights = []
-    for cat in categories:
+    for slug in SPOTLIGHT_ORDER:
+        cat = cats_by_slug.get(slug)
+        if not cat:
+            continue
         cat_products = (
             Product.query.filter_by(category_id=cat.id)
             .order_by(Product.id)
@@ -46,7 +53,7 @@ def home():
         if cat_products:
             category_spotlights.append({
                 "category": cat,
-                "subtitle": CATEGORY_SPOTLIGHT_SUBTITLES.get(cat.slug, ""),
+                "subtitle": CATEGORY_SPOTLIGHT_SUBTITLES.get(slug, ""),
                 "products": cat_products,
             })
 
@@ -58,6 +65,26 @@ def home():
         current_season=season,
         category_spotlights=category_spotlights,
     )
+
+@main_bp.route("/wishlist")
+def wishlist():
+    """Wishlist page. The saved items live in the browser (localStorage), so
+    the page shell is rendered here and filled in by JS via /wishlist/cards."""
+    return render_template("wishlist.html")
+
+
+@main_bp.route("/wishlist/cards")
+def wishlist_cards():
+    """Return the product cards (HTML fragment) for a comma-separated list of
+    product IDs, preserving the order they were saved in."""
+    raw = request.args.get("ids", "")
+    id_list = [int(x) for x in raw.split(",") if x.strip().isdigit()]
+    products = []
+    if id_list:
+        found = {p.id: p for p in Product.query.filter(Product.id.in_(id_list)).all()}
+        products = [found[i] for i in id_list if i in found]
+    return render_template("partials/_wishlist_cards.html", products=products)
+
 
 @main_bp.route("/about")
 def about():
