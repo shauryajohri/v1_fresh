@@ -61,9 +61,13 @@ ul { list-style: none; margin: 0; padding: 0; }
 
 .container {
     width: 100%;
-    max-width: 1440px;
+    max-width: 100%;
     margin: 0 auto;
-    padding: 0 32px;
+    padding: 0 16px;
+}
+
+@media (min-width: 1600px) {
+    .container { padding: 0 24px; }
 }
 
 /* Visible focus state for keyboard nav */
@@ -150,6 +154,24 @@ a:focus-visible, button:focus-visible, input:focus-visible {
     text-decoration: underline;
     font-weight: 600;
 }
+.topbar-locate {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 8px;
+    padding: 3px 9px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--white);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+.topbar-locate:hover { background: rgba(255, 255, 255, 0.24); }
+.topbar-locate:disabled { opacity: 0.6; cursor: default; }
+.topbar-locate svg { flex-shrink: 0; }
 
 .navbar { background: var(--green-600); border-bottom: 1px solid var(--green-700); }
 .navbar { background: var(--green-600); border-bottom: 1px solid var(--green-700); }
@@ -427,6 +449,59 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 .perk-icon { font-size: 2rem; margin-bottom: 10px; }
 .perk h3 { font-size: 1.05rem; margin-bottom: 6px; }
 .perk p { font-size: 0.88rem; margin: 0; }
+
+/* ===========================================
+   Why Choose section
+   =========================================== */
+.why-choose {
+    background: linear-gradient(180deg, var(--green-50) 0%, var(--cream) 100%);
+    padding: 56px 0 60px;
+    margin-top: 40px;
+    text-align: center;
+}
+.why-choose-title { font-size: 1.9rem; margin: 0 0 6px; }
+.why-choose-subtitle { color: var(--ink-soft); margin: 0 0 34px; font-size: 1rem; }
+.why-choose-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+.why-choose-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    text-align: left;
+    background: var(--white);
+    border: 1px solid var(--green-100, #dcfce7);
+    border-radius: 14px;
+    padding: 20px 24px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+.why-choose-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: var(--green-50);
+    color: var(--green-700);
+}
+.why-choose-text h3 { font-size: 1.1rem; margin: 0 0 3px; }
+.why-choose-text p { margin: 0; font-size: 0.9rem; color: var(--ink-soft); }
+.why-choose-rating {
+    margin-top: 30px;
+    font-size: 1rem;
+    color: var(--ink-soft);
+}
+.why-choose-rating strong { color: var(--ink); }
+.why-choose-stars { color: #f5a623; letter-spacing: 2px; margin-right: 8px; font-size: 1.1rem; }
+@media (max-width: 860px) {
+    .why-choose-grid { grid-template-columns: 1fr; max-width: 460px; }
+}
 
 /* ===========================================
    Section heading

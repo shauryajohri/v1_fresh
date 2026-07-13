@@ -305,4 +305,60 @@ if (topbarEl) {
         if (totalEl) totalEl.textContent = "₹" + Math.round(data.total);
     }
 
+    // ── Live location: detect user's area via browser geolocation ──
+    const locateBtn = document.getElementById("detectLocation");
+    const locationLabel = document.getElementById("userLocation");
+
+    // Restore a previously detected location for this browser
+    try {
+        const saved = localStorage.getItem("v1fresh_location");
+        if (saved && locationLabel) locationLabel.textContent = saved;
+    } catch (e) { /* storage unavailable — ignore */ }
+
+    if (locateBtn && locationLabel) {
+        locateBtn.addEventListener("click", () => {
+            if (!("geolocation" in navigator)) {
+                locationLabel.textContent = "Location not supported";
+                return;
+            }
+            const original = locationLabel.textContent;
+            locationLabel.textContent = "Detecting…";
+            locateBtn.disabled = true;
+
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const { latitude, longitude } = pos.coords;
+                try {
+                    const res = await fetch(
+                        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+                    );
+                    const data = await res.json();
+                    const area =
+                        data.locality ||
+                        data.city ||
+                        data.principalSubdivision ||
+                        "";
+                    const region = data.principalSubdivision || "";
+                    const label = area
+                        ? (region && region !== area ? `${area}, ${region}` : area)
+                        : "Your location";
+                    locationLabel.textContent = label;
+                    try { localStorage.setItem("v1fresh_location", label); } catch (e) {}
+                } catch (err) {
+                    locationLabel.textContent = original;
+                } finally {
+                    locateBtn.disabled = false;
+                }
+            }, (err) => {
+                locationLabel.textContent =
+                    err.code === err.PERMISSION_DENIED ? "Location blocked" : original;
+                locateBtn.disabled = false;
+                setTimeout(() => {
+                    if (locationLabel.textContent === "Location blocked") {
+                        locationLabel.textContent = original;
+                    }
+                }, 2500);
+            }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
+        });
+    }
+
 });
