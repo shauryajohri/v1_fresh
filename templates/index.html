@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="hero-slider" id="heroSlider">
+    <div class="hero-slider-track">
+        <a href="{{ url_for('products.listing') }}" class="hero-slide is-active">
+            <img src="{{ url_for('static', filename='images/banners/banner1.png') }}" alt="Freshness Delivered Daily">
+        </a>
+        <a href="{{ url_for('products.listing') }}" class="hero-slide">
+            <img src="{{ url_for('static', filename='images/banners/banner2.png') }}" alt="Fresh Every Day - Premium Quality at Wholesale Price">
+        </a>
+        <a href="{{ url_for('products.listing') }}" class="hero-slide">
+            <img src="{{ url_for('static', filename='images/banners/banner3.png') }}" alt="Premium Quality, Better Price">
+        </a>
+        <a href="{{ url_for('products.listing') }}" class="hero-slide">
+            <img src="{{ url_for('static', filename='images/banners/banner4.png') }}" alt="Nature's Best, Delivered Fast">
+        </a>
+        <a href="{{ url_for('products.listing') }}" class="hero-slide">
+            <img src="{{ url_for('static', filename='images/banners/banner5.png') }}" alt="Freshness Delivered Daily">
+        </a>
+        <a href="{{ url_for('products.listing') }}" class="hero-slide">
+            <img src="{{ url_for('static', filename='images/banners/banner6.png') }}" alt="Free Delivery on Orders Above ₹199">
+        </a>
+    </div>
+    <div class="hero-slider-dots">
+        <button class="hero-dot is-active" data-slide="0" aria-label="Slide 1"></button>
+        <button class="hero-dot" data-slide="1" aria-label="Slide 2"></button>
+        <button class="hero-dot" data-slide="2" aria-label="Slide 3"></button>
+        <button class="hero-dot" data-slide="3" aria-label="Slide 4"></button>
+        <button class="hero-dot" data-slide="4" aria-label="Slide 5"></button>
+        <button class="hero-dot" data-slide="5" aria-label="Slide 6"></button>
+    </div>
+</section>
+
+<section class="perks">
+    <div class="container perks-grid">
+        <div class="perk">
+            <div class="perk-icon"></div>
+            <h3>Fresh</h3>
+            <p>Handpicked daily.</p>
+        </div>
+        <div class="perk">
+            <div class="perk-icon"></div>
+            <h3>Fast</h3>
+            <p>Same-day delivery</p>
+        </div>
+        <div class="perk">
+            <div class="perk-icon"></div>
+            <h3>Wholesale</h3>
+            <p>Best prices</p>
+        </div>
+    </div>
+</section>
+
+<section class="featured-section seasonal-section">
+    <div class="container">
+        <div class="section-heading">
+            <div>
+                <h2>🌱 Seasonal Picks</h2>
+                <p class="section-subtitle">In-season produce — peak freshness, best prices</p>
+            </div>
+            <a href="{{ url_for('products.listing', season=current_season) }}" class="see-all">Shop all →</a>
+        </div>
+
+        <div class="product-grid">
+            {% for product in seasonal_products %}
+                {% include "partials/_product_card.html" %}
+            {% else %}
+                <p class="empty-note">No seasonal picks tagged yet for this season.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="category-section">
+    <div class="container">
+        <div class="section-heading">
+            <h2>Shop by Category</h2>
+            <a href="{{ url_for('products.listing') }}" class="see-all">View all</a>
+        </div>
+        <div class="category-grid">
+            {% set cat_emoji = {
+                'fruits': '🍎',
+                'vegetables': '🥬',
+                'leafy-greens': '🌿',
+                'exotic': '🥑',
+                'combo-packs': '📦',
+                'dairy-eggs': '🥚'
+            } %}
+            {% for cat in categories %}
+            <a href="{{ url_for('products.listing', category=cat.slug) }}" class="category-card">
+                <div class="category-card-img">
+                    <span class="category-card-emoji">{{ cat_emoji.get(cat.slug, '🛒') }}</span>
+                </div>
+                <span>{{ cat.name }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% for spotlight in category_spotlights %}
+<section class="featured-section category-spotlight">
+    <div class="container">
+        <div class="section-heading">
+            <div>
+                <h2>Fresh {{ spotlight.category.name }}</h2>
+                {% if spotlight.subtitle %}
+                    <p class="section-subtitle">{{ spotlight.subtitle }}</p>
+                {% endif %}
+            </div>
+            <a href="{{ url_for('products.listing', category=spotlight.category.slug) }}" class="see-all">View all →</a>
+        </div>
+        <div class="product-grid product-grid-compact">
+            {% for product in spotlight.products %}
+                {% include "partials/_product_card.html" %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endfor %}
+{% endblock %}

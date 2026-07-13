@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ "Edit" if mode == "edit" else "Add" }} Product · Admin · v1fresh</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body class="admin-body">
+
+    <header class="admin-topbar">
+        <div class="admin-topbar-inner">
+            <span class="admin-brand"><span class="brand-mark">v1</span><span class="brand-rest">fresh</span> <span class="admin-tag">Admin</span></span>
+            <a href="{{ url_for('admin.dashboard') }}" class="admin-back-link">← Back to inventory</a>
+        </div>
+    </header>
+
+    <main class="admin-main admin-main-narrow">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="admin-flash-wrap">
+                    {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <h1>{{ "Edit Product" if mode == "edit" else "Add New Product" }}</h1>
+
+        <form class="admin-form" method="post" enctype="multipart/form-data">
+            <div class="admin-form-grid">
+                <label class="admin-field">
+                    <span>Product Name *</span>
+                    <input type="text" name="name" required value="{{ product.name if product else '' }}">
+                </label>
+
+                <label class="admin-field">
+                    <span>Category *</span>
+                    <select name="category_id" required>
+                        <option value="" disabled {{ "selected" if not product }}>Select category</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.id }}" {{ "selected" if product and product.category_id == cat.id }}>{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label class="admin-field">
+                    <span>Price (₹) *</span>
+                    <input type="number" step="0.01" min="0" name="price" required value="{{ product.price if product else '' }}">
+                </label>
+
+                <label class="admin-field">
+                    <span>MRP (₹, optional)</span>
+                    <input type="number" step="0.01" min="0" name="mrp" value="{{ product.mrp if product and product.mrp else '' }}">
+                </label>
+
+                <label class="admin-field">
+                    <span>Unit</span>
+                    <select name="unit">
+                        {% for u in ["kg", "gram", "dozen", "piece", "bunch", "litre", "pack"] %}
+                        <option value="{{ u }}" {{ "selected" if product and product.unit == u }}>{{ u }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label class="admin-field">
+                    <span>Stock Quantity</span>
+                    <input type="number" min="0" name="stock" value="{{ product.stock if product else 0 }}">
+                </label>
+
+                <label class="admin-field">
+                    <span>Season</span>
+                    <select name="season">
+                        {% for s in ["winter", "summer", "monsoon", "all-season"] %}
+                        <option value="{{ s }}" {{ "selected" if product and product.season == s }}>{{ s.replace('-', ' ')|title }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </div>
+
+            <label class="admin-field">
+                <span>Description</span>
+                <textarea name="description" rows="3">{{ product.description if product and product.description else '' }}</textarea>
+            </label>
+
+            <div class="admin-form-grid">
+                <label class="admin-checkbox-field">
+                    <input type="checkbox" name="is_featured" {{ "checked" if product and product.is_featured }}>
+                    <span>Featured product</span>
+                </label>
+                <label class="admin-checkbox-field">
+                    <input type="checkbox" name="is_organic" {{ "checked" if product and product.is_organic }}>
+                    <span>Organic</span>
+                </label>
+            </div>
+
+            <label class="admin-field">
+                <span>Product Image {{ "" if mode == "edit" else "" }}</span>
+                <input type="file" name="image_file" accept=".png,.jpg,.jpeg,.webp,.gif">
+            </label>
+
+            {% if product and product.image %}
+            <div class="admin-current-image">
+                <span>Current image:</span>
+                <img src="{{ product.image }}" alt="{{ product.name }}">
+            </div>
+            {% endif %}
+
+            <div class="admin-form-actions">
+                <button type="submit" class="btn btn-primary">{{ "Save Changes" if mode == "edit" else "Add Product" }}</button>
+                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost">Cancel</a>
+            </div>
+        </form>
+    </main>
+
+</body>
+</html>

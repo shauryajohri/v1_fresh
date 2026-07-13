@@ -1,0 +1,115 @@
+﻿{% extends "base.html" %}
+{% block title %}{{ active_category.name if active_category else "All Products" }} - v1fresh{% endblock %}
+
+{% block content %}
+<section class="listing-page container">
+    <div class="listing-layout">
+        <aside class="listing-sidebar">
+            <h3>Categories</h3>
+            <ul class="sidebar-cat-list">
+                <li><a href="{{ url_for('products.listing') }}" class="{{ 'active' if not active_category else '' }}">All Products</a></li>
+                {% for cat in categories %}
+                <li><a href="{{ url_for('products.listing', category=cat.slug) }}" class="{{ 'active' if active_category and active_category.id == cat.id else '' }}">{{ cat.name }}</a></li>
+                {% endfor %}
+            </ul>
+
+            <h3 class="season-filter-heading">Season</h3>
+            <ul class="sidebar-cat-list">
+                <li><a href="{{ url_for('products.listing', category=active_category.slug if active_category else None) }}" class="{{ 'active' if not active_season else '' }}">All Seasons</a></li>
+                {% for s in ["winter", "summer", "monsoon", "all-season"] %}
+                <li>
+                    <a href="{{ url_for('products.listing', category=active_category.slug if active_category else None, season=s) }}" class="{{ 'active' if active_season == s else '' }}">
+                        {{ s.replace('-', ' ')|title }}{{ " (current)" if s == current_season else "" }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </aside>
+
+        <div class="listing-main">
+            <div class="listing-header">
+                <h1>{{ active_category.name if active_category else "All Products" }}</h1>
+                <span class="result-count" id="resultCount">{{ products|length }} products</span>
+            </div>
+
+            <div class="listing-search-wrap">
+                <input
+                    type="text"
+                    id="liveSearch"
+                    placeholder="Search products..."
+                    value="{{ request.args.get('q', '') }}"
+                    autocomplete="off"
+                >
+            </div>
+
+            {% if products %}
+            <div class="product-grid" id="productGrid">
+                {% for product in products %}
+                <div class="product-card-wrapper" data-name="{{ product.name | lower }}">
+                    {% include "partials/_product_card.html" %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p class="empty-state-icon">&#x1F966;</p>
+                <p>No products found{% if request.args.get('q') %} for "{{ request.args.get('q') }}"{% endif %}.</p>
+                <a href="{{ url_for('products.listing') }}" class="btn btn-ghost">Browse all products</a>
+            </div>
+            {% endif %}
+
+            <div class="empty-state" id="noResults" style="display:none;">
+                <p class="empty-state-icon">&#x1F50D;</p>
+                <p>No products match your search.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const searchInput = document.getElementById('liveSearch');
+const grid = document.getElementById('productGrid');
+const countEl = document.getElementById('resultCount');
+const noResults = document.getElementById('noResults');
+
+function highlight(text, query) {
+    if (!query) return text;
+    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return text.replace(new RegExp('(' + escaped + ')', 'gi'), '<mark>$1</mark>');
+}
+
+if (searchInput && grid) {
+    searchInput.addEventListener('input', () => {
+        const q = searchInput.value.trim().toLowerCase();
+        const wrappers = grid.querySelectorAll('.product-card-wrapper');
+        let visible = 0;
+
+        wrappers.forEach(wrapper => {
+            const name = wrapper.dataset.name;
+            const nameEl = wrapper.querySelector('.product-card-name');
+            if (!nameEl.dataset.original) {
+                nameEl.dataset.original = nameEl.textContent;
+            }
+            const original = nameEl.dataset.original;
+
+            if (!q || name.includes(q)) {
+                wrapper.style.display = '';
+                nameEl.innerHTML = highlight(original, q);
+                visible++;
+            } else {
+                wrapper.style.display = 'none';
+            }
+        });
+
+        countEl.textContent = visible + ' products';
+        noResults.style.display = visible === 0 ? '' : 'none';
+    });
+
+    if (searchInput.value) {
+        searchInput.dispatchEvent(new Event('input'));
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Checkout - v1fresh{% endblock %}
+{% block content %}
+<section class="static-page container">
+    <h1>Checkout</h1>
+    <p class="muted">Name, phone, and delivery address form will be wired up in Phase 3 — no login required.</p>
+    <a href="{{ url_for('cart.view_cart') }}" class="btn btn-ghost">← Back to cart</a>
+</section>
+{% endblock %}

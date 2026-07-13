@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Contact - v1fresh{% endblock %}
+{% block content %}
+<section class="static-page container">
+    <h1>Get in Touch</h1>
+    <p>Want v1fresh in your housing society? Reach out and we'll check availability.</p>
+    <form class="contact-form">
+        <input type="text" placeholder="Your name" required>
+        <input type="text" placeholder="Housing society / area" required>
+        <input type="tel" placeholder="Phone number" required>
+        <button type="submit" class="btn btn-primary">Request Callback</button>
+    </form>
+    <p class="muted">Form submission will be wired up in a later phase.</p>
+</section>
+{% endblock %}

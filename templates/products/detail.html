@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} - v1fresh{% endblock %}
+
+{% block content %}
+<section class="product-detail container">
+    {% set base_name = product.name.split('(')[0].strip() %}
+    {% set hindi_name = product.name.split('(')[1].rstrip(')') if '(' in product.name else '' %}
+
+    <div class="detail-header-row">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('main.home') }}">Home</a> /
+            <a href="{{ url_for('products.listing') }}">Products</a> /
+            <span>{{ base_name }}</span>
+        </nav>
+        <a href="javascript:history.back()" class="btn-back">‹ Back</a>
+    </div>
+
+    <div class="product-detail-layout">
+        <div class="product-detail-img">
+            <img src="{{ product.image }}" alt="{{ product.name }}">
+        </div>
+
+        <div class="product-detail-info">
+            {% if product.is_organic %}<span class="badge-pill badge-pill-organic">Organic</span>{% endif %}
+
+            <h1>{{ base_name }}</h1>
+            {% if hindi_name %}<p class="product-detail-hindi">{{ hindi_name }}</p>{% endif %}
+
+            <div class="detail-meta-row">
+                <span>Category: {{ product.category.name }}</span>
+                <span class="detail-meta-dot">•</span>
+                {% if product.rating %}
+                <span class="detail-meta-rating">★ {{ product.rating }} rating</span>
+                {% else %}
+                <span class="detail-meta-rating">No ratings yet</span>
+                {% endif %}
+            </div>
+
+{% set weight_chips = weight_options_for(product.unit, detail=True) %}
+{% if weight_chips|length > 1 %}
+<div class="detail-weight-section">
+    <span class="detail-weight-label">Select Weight</span>
+    <div class="detail-weight-chip-row" data-base-price="{{ product.price }}" data-base-mrp="{{ product.mrp or '' }}">
+        {% for label, fraction in weight_chips %}
+        <span class="detail-weight-chip{{ ' is-selected' if loop.first else '' }}" data-action="detail-chip" data-label="{{ label }}" data-fraction="{{ fraction }}">{{ label }}</span>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div class="detail-price-box" data-base-price="{{ product.price }}">
+    <span class="price-large" data-role="detail-price">₹{{ "%.0f"|format(product.price * weight_chips[0][1]) }}</span>
+    {% if product.mrp and product.mrp > product.price %}
+    <span class="mrp" data-role="detail-mrp">₹{{ "%.0f"|format(product.mrp * weight_chips[0][1]) }}</span>
+    <span class="badge-discount-inline">{{ product.discount_percent }}% OFF</span>
+    {% endif %}
+    <span class="per-unit" data-role="detail-per-unit">/ {{ weight_chips[0][0] }}</span>
+</div>
+
+<p class="product-description">{{ product.description or "Fresh, hand-picked, and delivered same day." }}</p>
+
+{% if product.in_stock %}
+<div class="detail-qty-section">
+    <span class="detail-weight-label">Quantity</span>
+    <div class="qty-cart-row">
+        <div class="qty-selector" data-product-id="{{ product.id }}">
+            <button class="qty-btn" data-action="decrease">−</button>
+            <span class="qty-value">1</span>
+            <button class="qty-btn" data-action="increase">+</button>
+        </div>
+        <span class="detail-total" data-role="detail-total">Total: ₹{{ "%.2f"|format(product.price * weight_chips[0][1]) }}</span>
+    </div>
+</div>
+
+<div class="stock-indicator">
+    <span class="stock-dot"></span> In Stock ({{ product.stock }} available)
+</div>
+
+<div class="detail-action-row">
+    <button class="btn btn-primary btn-add-cart-large" data-product-id="{{ product.id }}" data-action="add" data-weight-label="{{ weight_chips[0][0] }}">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+        Add to Cart
+    </button>
+    <button class="btn-save" type="button" data-action="wishlist" aria-label="Save for later">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-6.7-4.35-9.3-8.1C.8 10 1.4 6.4 4.6 5 7 4 9.6 4.9 12 7.6 14.4 4.9 17 4 19.4 5c3.2 1.4 3.8 5 1.9 7.9C18.7 16.65 12 21 12 21z"/></svg>
+        Save
+    </button>
+</div>
+{% else %}
+<p class="out-of-stock-msg">Currently out of stock — check back soon.</p>
+{% endif %}
+
+            <ul class="product-perks-list">
+                <li>✓ Sourced fresh same morning</li>
+                <li>✓ Quality checked before dispatch</li>
+                <li>✓ Easy replacement if not satisfied</li>
+            </ul>
+        </div>
+    </div>
+
+    {% if related %}
+    <div class="related-section">
+        <h2>You may also like</h2>
+        <div class="product-grid">
+            {% for product in related %}
+                {% include "partials/_product_card.html" %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

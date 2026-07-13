@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Your Cart - v1fresh{% endblock %}
+
+{% block content %}
+<section class="cart-page container">
+    <h1>Your Cart</h1>
+
+    {% if cart_items %}
+    <div class="cart-layout">
+        <div class="cart-items" id="cartItemsList">
+            {% for item in cart_items %}
+            <div class="cart-item" data-product-id="{{ item.product.id }}" data-weight-label="{{ item.weight_label }}">
+                <img src="{{ item.product.image }}" alt="{{ item.product.name }}">
+                <div class="cart-item-info">
+                    <span class="cart-item-name">{{ item.product.name }}</span>
+                    <span class="cart-item-unit">{{ item.weight_label }}</span>
+                </div>
+                <div class="qty-selector" data-product-id="{{ item.product.id }}">
+                    <button class="qty-btn" data-action="decrease">−</button>
+                    <span class="qty-value">{{ item.quantity }}</span>
+                    <button class="qty-btn" data-action="increase">+</button>
+                </div>
+                <span class="cart-item-total">₹{{ "%.0f"|format(item.line_total) }}</span>
+                <button class="remove-item" data-action="remove" data-product-id="{{ item.product.id }}" aria-label="Remove">✕</button>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="cart-summary">
+            <h3>Order Summary</h3>
+            {% if amount_for_free_delivery > 0 %}
+            <p class="free-delivery-hint">Add ₹{{ "%.0f"|format(amount_for_free_delivery) }} more for free delivery</p>
+            {% endif %}
+            <div class="summary-row"><span>Subtotal</span><span id="cartSubtotal">₹{{ "%.0f"|format(subtotal) }}</span></div>
+            <div class="summary-row"><span>Delivery</span><span id="cartDeliveryFee">{{ "₹%.0f"|format(delivery_fee) if delivery_fee > 0 else "FREE" }}</span></div>
+            <div class="summary-row summary-total"><span>Total</span><span id="cartTotal">₹{{ "%.0f"|format(total) }}</span></div>
+            <a href="{{ url_for('orders.checkout') }}" class="btn btn-primary btn-full">Proceed to Checkout</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">🛒</div>
+        <p>Your cart is empty.</p>
+        <a href="{{ url_for('products.listing') }}" class="btn btn-primary">Start Shopping</a>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

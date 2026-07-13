@@ -1,0 +1,116 @@
+original_name,predicted_label,confidence,final_class,new_name,top3
+acorn_squash.jpg,watermelon,0.9736,watermelon,watermelon_acorn_squash.jpg,watermelon:0.97; onion:0.01; cabbage:0.01
+baingan.jpg,jalepeno,0.8861,jalepeno,jalepeno_baingan.jpg,jalepeno:0.89; chilli pepper:0.06; pear:0.05
+banana.jpg,banana,0.9898,banana,banana_banana.jpg,banana:0.99; lemon:0.01; mango:0.00
+baseball.jpg,kiwi,0.6328,kiwi,kiwi_baseball.jpg,kiwi:0.63; soy beans:0.18; sweetcorn:0.09
+blue berry.jpg,eggplant,0.9964,eggplant,eggplant_blue berry.jpg,eggplant:1.00; jalepeno:0.00; bell pepper:0.00
+broccoli.jpg,lettuce,0.9989,lettuce,lettuce_broccoli.jpg,lettuce:1.00; raddish:0.00; cabbage:0.00
+broom.jpg,beetroot,0.4737,unclassified,unclassified_broom.jpg,beetroot:0.47; turnip:0.42; lettuce:0.03
+broom_2.jpg,lettuce,0.8281,lettuce,lettuce_broom_2.jpg,lettuce:0.83; cabbage:0.10; turnip:0.04
+buckeye.png,eggplant,0.9934,eggplant,eggplant_buckeye.png,eggplant:0.99; cucumber:0.00; jalepeno:0.00
+butternut_squash.jpg,ginger,0.6019,ginger,ginger_butternut_squash.jpg,ginger:0.60; sweetpotato:0.38; potato:0.02
+cauliflower.png,cauliflower,0.9996,cauliflower,cauliflower_cauliflower.png,cauliflower:1.00; lemon:0.00; cabbage:0.00
+cauliflower_2.png,cauliflower,0.9996,cauliflower,cauliflower_cauliflower_2.png,cauliflower:1.00; lemon:0.00; cabbage:0.00
+coil.jpg,peas,0.3178,unclassified,unclassified_coil.jpg,peas:0.32; banana:0.27; soy beans:0.22
+coil_2.jpg,cabbage,0.2864,unclassified,unclassified_coil_2.jpg,cabbage:0.29; cucumber:0.20; onion:0.16
+conch.jpg,garlic,0.9896,garlic,garlic_conch.jpg,garlic:0.99; onion:0.00; ginger:0.00
+cucumber.jpg,soy beans,0.7019,soy beans,soy beans_cucumber.jpg,soy beans:0.70; peas:0.11; chilli pepper:0.10
+cucumber.png,jalepeno,0.4255,unclassified,unclassified_cucumber.png,jalepeno:0.43; eggplant:0.23; cucumber:0.09
+cucumber_2.jpg,cucumber,0.9998,cucumber,cucumber_cucumber_2.jpg,cucumber:1.00; jalepeno:0.00; eggplant:0.00
+cucumber_2.png,cucumber,1.0,cucumber,cucumber_cucumber_2.png,cucumber:1.00; jalepeno:0.00; sweetcorn:0.00
+cucumber_3.jpg,cucumber,0.9872,cucumber,cucumber_cucumber_3.jpg,cucumber:0.99; jalepeno:0.01; watermelon:0.00
+cucumber_3.png,peas,1.0,peas,peas_cucumber_3.png,peas:1.00; soy beans:0.00; cucumber:0.00
+cucumber_4.jpg,watermelon,1.0,watermelon,watermelon_cucumber_4.jpg,watermelon:1.00; jalepeno:0.00; tomato:0.00
+cucumber_4.png,cucumber,0.9999,cucumber,cucumber_cucumber_4.png,cucumber:1.00; jalepeno:0.00; eggplant:0.00
+cucumber_5.png,cucumber,1.0,cucumber,cucumber_cucumber_5.png,cucumber:1.00; jalepeno:0.00; eggplant:0.00
+digital_clock.png,raddish,0.3854,unclassified,unclassified_digital_clock.png,raddish:0.39; orange:0.12; apple:0.10
+dough.png,potato,0.9638,potato,potato_dough.png,potato:0.96; sweetpotato:0.03; paprika:0.00
+dough_2.png,potato,0.6557,potato,potato_dough_2.png,potato:0.66; sweetpotato:0.15; ginger:0.14
+ear.jpg,cucumber,0.9498,cucumber,cucumber_ear.jpg,cucumber:0.95; raddish:0.03; corn:0.01
+ear.png,sweetcorn,0.9885,sweetcorn,sweetcorn_ear.png,sweetcorn:0.99; corn:0.01; pineapple:0.00
+eggnog.jpg,ginger,0.4942,unclassified,unclassified_eggnog.jpg,ginger:0.49; potato:0.29; sweetpotato:0.14
+face_powder.jpg,ginger,0.4376,unclassified,unclassified_face_powder.jpg,ginger:0.44; onion:0.32; sweetpotato:0.11
+face_powder.png,turnip,0.9173,turnip,turnip_face_powder.png,turnip:0.92; potato:0.03; raddish:0.01
+fig.jpg,eggplant,0.9801,eggplant,eggplant_fig.jpg,eggplant:0.98; turnip:0.01; beetroot:0.00
+fig_2.jpg,mango,0.601,mango,mango_fig_2.jpg,mango:0.60; lemon:0.27; pear:0.09
+fig_3.jpg,beetroot,0.3241,unclassified,unclassified_fig_3.jpg,beetroot:0.32; paprika:0.19; potato:0.09
+fig_4.jpg,grapes,0.9999,grapes,grapes_fig_4.jpg,grapes:1.00; corn:0.00; banana:0.00
+french_loaf.jpg,potato,0.9214,potato,potato_french_loaf.jpg,potato:0.92; sweetpotato:0.08; ginger:0.00
+french_loaf.png,raddish,0.9622,raddish,raddish_french_loaf.png,raddish:0.96; turnip:0.04; spinach:0.00
+french_loaf_2.jpg,potato,0.5133,unclassified,unclassified_french_loaf_2.jpg,potato:0.51; corn:0.15; sweetpotato:0.11
+french_loaf_3.jpg,sweetpotato,0.9901,sweetpotato,sweetpotato_french_loaf_3.jpg,sweetpotato:0.99; potato:0.01; carrot:0.00
+french_loaf_4.jpg,ginger,0.9986,ginger,ginger_french_loaf_4.jpg,ginger:1.00; sweetpotato:0.00; potato:0.00
+french_loaf_5.jpg,carrot,0.9069,carrot,carrot_french_loaf_5.jpg,carrot:0.91; sweetpotato:0.06; sweetcorn:0.03
+gila_monster.jpg,ginger,0.4242,unclassified,unclassified_gila_monster.jpg,ginger:0.42; sweetpotato:0.40; potato:0.16
+granny_smith.jpg,mango,0.6892,mango,mango_granny_smith.jpg,mango:0.69; tomato:0.22; apple:0.04
+granny_smith.png,cucumber,0.315,unclassified,unclassified_granny_smith.png,cucumber:0.32; peas:0.23; soy beans:0.11
+granny_smith_2.jpg,apple,0.9043,apple,apple_granny_smith_2.jpg,apple:0.90; pear:0.04; jalepeno:0.02
+granny_smith_2.png,raddish,0.3393,unclassified,unclassified_granny_smith_2.png,raddish:0.34; tomato:0.14; peas:0.13
+granny_smith_3.jpg,jalepeno,0.7246,jalepeno,jalepeno_granny_smith_3.jpg,jalepeno:0.72; cucumber:0.26; peas:0.01
+granny_smith_3.png,apple,0.9771,apple,apple_granny_smith_3.png,apple:0.98; tomato:0.02; pear:0.00
+granny_smith_4.jpg,pear,0.9998,pear,pear_granny_smith_4.jpg,pear:1.00; mango:0.00; jalepeno:0.00
+granny_smith_4.png,mango,0.4437,unclassified,unclassified_granny_smith_4.png,mango:0.44; apple:0.16; peas:0.10
+granny_smith_5.jpg,apple,0.9912,apple,apple_granny_smith_5.jpg,apple:0.99; pear:0.00; paprika:0.00
+hair_slide.jpg,corn,0.6726,corn,corn_hair_slide.jpg,corn:0.67; cucumber:0.11; raddish:0.05
+hair_slide_2.jpg,grapes,0.9998,grapes,grapes_hair_slide_2.jpg,grapes:1.00; lemon:0.00; peas:0.00
+hamper.jpg,soy beans,0.3267,unclassified,unclassified_hamper.jpg,soy beans:0.33; spinach:0.09; lettuce:0.08
+hamper.png,bell pepper,0.1459,unclassified,unclassified_hamper.png,bell pepper:0.15; peas:0.12; mango:0.11
+hamper_2.jpg,grapes,0.9187,grapes,grapes_hamper_2.jpg,grapes:0.92; eggplant:0.02; ginger:0.01
+hamper_2.png,sweetpotato,0.5451,unclassified,unclassified_hamper_2.png,sweetpotato:0.55; ginger:0.28; potato:0.08
+hamper_3.jpg,spinach,0.6342,spinach,spinach_hamper_3.jpg,spinach:0.63; peas:0.22; cucumber:0.08
+hamper_3.png,spinach,0.5043,unclassified,unclassified_hamper_3.png,spinach:0.50; sweetcorn:0.09; peas:0.08
+hamper_4.jpg,apple,0.3101,unclassified,unclassified_hamper_4.jpg,apple:0.31; onion:0.24; tomato:0.19
+hamper_5.jpg,cucumber,0.9776,cucumber,cucumber_hamper_5.jpg,cucumber:0.98; peas:0.00; spinach:0.00
+hamper_6.jpg,onion,1.0,onion,onion_hamper_6.jpg,onion:1.00; sweetpotato:0.00; pomegranate:0.00
+head_cabbage.jpg,cabbage,0.8076,cabbage,cabbage_head_cabbage.jpg,cabbage:0.81; lemon:0.16; spinach:0.02
+head_cabbage.png,turnip,0.9999,turnip,turnip_head_cabbage.png,turnip:1.00; beetroot:0.00; raddish:0.00
+head_cabbage_2.jpg,lettuce,0.8295,lettuce,lettuce_head_cabbage_2.jpg,lettuce:0.83; soy beans:0.08; spinach:0.05
+head_cabbage_2.png,cabbage,1.0,cabbage,cabbage_head_cabbage_2.png,cabbage:1.00; onion:0.00; pineapple:0.00
+head_cabbage_3.jpg,turnip,0.9503,turnip,turnip_head_cabbage_3.jpg,turnip:0.95; eggplant:0.01; cauliflower:0.01
+head_cabbage_4.jpg,beetroot,1.0,beetroot,beetroot_head_cabbage_4.jpg,beetroot:1.00; turnip:0.00; onion:0.00
+head_cabbage_5.jpg,lettuce,0.9997,lettuce,lettuce_head_cabbage_5.jpg,lettuce:1.00; cabbage:0.00; turnip:0.00
+head_cabbage_6.jpg,spinach,0.9991,spinach,spinach_head_cabbage_6.jpg,spinach:1.00; beetroot:0.00; turnip:0.00
+jackfruit.jpg,lemon,0.5648,unclassified,unclassified_jackfruit.jpg,lemon:0.56; kiwi:0.21; peas:0.07
+kacha_banana.jpg,banana,0.9952,banana,banana_kacha_banana.jpg,banana:1.00; raddish:0.00; cucumber:0.00
+knot.jpg,carrot,0.9991,carrot,carrot_knot.jpg,carrot:1.00; sweetpotato:0.00; paprika:0.00
+lauki.jpg,banana,0.9242,banana,banana_lauki.jpg,banana:0.92; raddish:0.02; jalepeno:0.01
+lemon.jpg,pear,0.9994,pear,pear_lemon.jpg,pear:1.00; jalepeno:0.00; lemon:0.00
+lemon.png,apple,0.4452,unclassified,unclassified_lemon.png,apple:0.45; kiwi:0.17; peas:0.13
+lemon_2.jpg,lemon,0.9999,lemon,lemon_lemon_2.jpg,lemon:1.00; orange:0.00; mango:0.00
+lemon_3.jpg,kiwi,1.0,kiwi,kiwi_lemon_3.jpg,kiwi:1.00; onion:0.00; lemon:0.00
+lemon_4.jpg,lemon,0.9999,lemon,lemon_lemon_4.jpg,lemon:1.00; orange:0.00; mango:0.00
+lotion.jpg,garlic,0.9991,garlic,garlic_lotion.jpg,garlic:1.00; onion:0.00; pineapple:0.00
+matar.png,soy beans,0.9499,soy beans,soy beans_matar.png,soy beans:0.95; peas:0.03; sweetpotato:0.01
+mortar.jpg,onion,0.9068,onion,onion_mortar.jpg,onion:0.91; ginger:0.08; paprika:0.01
+mortar.png,cauliflower,0.4696,unclassified,unclassified_mortar.png,cauliflower:0.47; turnip:0.33; ginger:0.05
+mortar_2.jpg,cucumber,0.9669,cucumber,cucumber_mortar_2.jpg,cucumber:0.97; eggplant:0.03; kiwi:0.00
+multicolor paper.jpg,bell pepper,0.9774,bell pepper,bell pepper_multicolor paper.jpg,bell pepper:0.98; capsicum:0.02; paprika:0.00
+orange.jpg,orange,0.9986,orange,orange_orange.jpg,orange:1.00; tomato:0.00; lemon:0.00
+orange_2.jpg,mango,0.9995,mango,mango_orange_2.jpg,mango:1.00; sweetpotato:0.00; sweetcorn:0.00
+palak.png,spinach,0.5199,unclassified,unclassified_palak.png,spinach:0.52; beetroot:0.14; turnip:0.10
+pineapple.jpg,pineapple,0.9999,pineapple,pineapple_pineapple.jpg,pineapple:1.00; corn:0.00; turnip:0.00
+pomegranate.jpg,sweetpotato,0.6583,sweetpotato,sweetpotato_pomegranate.jpg,sweetpotato:0.66; beetroot:0.14; tomato:0.07
+pomegranate_2.jpg,pomegranate,1.0,pomegranate,pomegranate_pomegranate_2.jpg,pomegranate:1.00; tomato:0.00; beetroot:0.00
+pot.jpg,lettuce,0.9925,lettuce,lettuce_pot.jpg,lettuce:0.99; turnip:0.00; spinach:0.00
+pot.png,spinach,0.4993,unclassified,unclassified_pot.png,spinach:0.50; corn:0.32; carrot:0.04
+pot_2.jpg,lettuce,0.9848,lettuce,lettuce_pot_2.jpg,lettuce:0.98; turnip:0.01; spinach:0.00
+pot_2.png,corn,0.9671,corn,corn_pot_2.png,corn:0.97; pineapple:0.02; sweetcorn:0.01
+pot_3.jpg,spinach,0.9338,spinach,spinach_pot_3.jpg,spinach:0.93; turnip:0.03; lettuce:0.02
+pot_3.png,spinach,0.9995,spinach,spinach_pot_3.png,spinach:1.00; jalepeno:0.00; capsicum:0.00
+pot_4.jpg,spinach,0.7733,spinach,spinach_pot_4.jpg,spinach:0.77; lettuce:0.11; pineapple:0.05
+shimla mirch.png,bell pepper,0.5818,unclassified,unclassified_shimla mirch.png,bell pepper:0.58; capsicum:0.38; spinach:0.02
+shopping_basket.png,kiwi,0.6103,kiwi,kiwi_shopping_basket.png,kiwi:0.61; pear:0.30; peas:0.03
+shopping_basket_2.png,eggplant,0.9237,eggplant,eggplant_shopping_basket_2.png,eggplant:0.92; sweetpotato:0.04; cucumber:0.01
+spaghetti_squash.jpg,pear,0.9666,pear,pear_spaghetti_squash.jpg,pear:0.97; kiwi:0.01; mango:0.01
+spaghetti_squash.png,sweetpotato,0.9461,sweetpotato,sweetpotato_spaghetti_squash.png,sweetpotato:0.95; mango:0.03; orange:0.01
+strawberry.jpg,mango,0.9997,mango,mango_strawberry.jpg,mango:1.00; apple:0.00; sweetpotato:0.00
+strawberry_2.jpg,apple,0.8612,apple,apple_strawberry_2.jpg,apple:0.86; raddish:0.10; beetroot:0.01
+strawberry_3.jpg,raddish,0.4293,unclassified,unclassified_strawberry_3.jpg,raddish:0.43; paprika:0.35; apple:0.09
+strawberry_4.jpg,raddish,0.4268,unclassified,unclassified_strawberry_4.jpg,raddish:0.43; beetroot:0.27; turnip:0.21
+strawberry_5.jpg,tomato,0.9999,tomato,tomato_strawberry_5.jpg,tomato:1.00; jalepeno:0.00; chilli pepper:0.00
+swab.png,cucumber,0.9991,cucumber,cucumber_swab.png,cucumber:1.00; corn:0.00; raddish:0.00
+tommato.jpg,jalepeno,0.4229,unclassified,unclassified_tommato.jpg,jalepeno:0.42; tomato:0.30; chilli pepper:0.14
+vase.jpg,pineapple,0.8294,pineapple,pineapple_vase.jpg,pineapple:0.83; corn:0.12; carrot:0.03
+velvet.png,beetroot,0.9998,beetroot,beetroot_velvet.png,beetroot:1.00; sweetpotato:0.00; onion:0.00
+zucchini.jpg,cucumber,1.0,cucumber,cucumber_zucchini.jpg,cucumber:1.00; jalepeno:0.00; corn:0.00
+zucchini_2.jpg,sweetpotato,0.3681,unclassified,unclassified_zucchini_2.jpg,sweetpotato:0.37; sweetcorn:0.25; cucumber:0.09

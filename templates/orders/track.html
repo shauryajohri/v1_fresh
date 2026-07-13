@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Track Order - v1fresh{% endblock %}
+{% block content %}
+<section class="static-page container">
+    <h1>Track Your Order</h1>
+    <p>Enter your order number and phone number to check status — no login needed.</p>
+    <form class="auth-form">
+        <input type="text" placeholder="Order number (e.g. V1F4K9X2)" required>
+        <input type="tel" placeholder="Phone number used at checkout" required>
+        <button type="submit" class="btn btn-primary">Track Order</button>
+    </form>
+    <p class="muted">Lookup logic ships in Phase 3.</p>
+</section>
+{% endblock %}

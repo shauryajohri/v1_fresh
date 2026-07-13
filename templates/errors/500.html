@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Something Went Wrong - v1fresh{% endblock %}
+{% block content %}
+<section class="error-page container">
+    <h1>500</h1>
+    <p>Something went wrong on our end — like a crate that fell off the truck. Try again shortly.</p>
+    <a href="{{ url_for('main.home') }}" class="btn btn-primary">Back to Home</a>
+</section>
+{% endblock %}
