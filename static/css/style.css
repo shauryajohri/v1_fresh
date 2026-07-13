@@ -593,7 +593,8 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 .section-heading { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 26px; }
 .section-heading h2 { font-size: 1.7rem; margin: 0; }
 .section-heading.center { flex-direction: column; align-items: center; text-align: center; }
-.seasonal-section {
+.seasonal-section,
+.spotlight-fruits {
     background: linear-gradient(180deg, var(--green-50) 0%, var(--cream) 100%);
 }
 .seasonal-section .section-heading { align-items: flex-start; }
