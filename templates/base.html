@@ -8,7 +8,7 @@
     <meta name="theme-color" content="#16a34a">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='20260713k') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='20260713m') }}">
     {% block extra_head %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
@@ -218,7 +218,8 @@
         tel:+919643551177
     </a>
 
-    <script src="{{ url_for('static', filename='js/main.js', v='20260713j') }}"></script>
+    <script>window.V1_CART = {{ cart | tojson }};</script>
+    <script src="{{ url_for('static', filename='js/main.js', v='20260713m') }}"></script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

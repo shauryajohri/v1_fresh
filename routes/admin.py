@@ -23,6 +23,16 @@ def _slugify(name):
     return slug.strip("-")
 
 
+def _resolve_mrp(mrp_raw, price_val):
+    """MRP defaults to the price when it's left blank or 0 — so there's no fake
+    discount and the strike-through price simply matches the selling price."""
+    try:
+        mrp_val = float(mrp_raw) if mrp_raw not in (None, "") else 0.0
+    except (TypeError, ValueError):
+        mrp_val = 0.0
+    return mrp_val if mrp_val > 0 else price_val
+
+
 def _save_uploaded_image(file_storage):
     """
     Saves an uploaded image into static/images/products/ with a unique
@@ -47,8 +57,32 @@ def _save_uploaded_image(file_storage):
 
 @admin_bp.route("/")
 def dashboard():
-    products = Product.query.order_by(Product.id.desc()).all()
-    return render_template("admin/dashboard.html", products=products)
+    # Sidebar filter: All Items, or a single category (vegetables / fruits).
+    cat_slug = request.args.get("category")
+    search_query = request.args.get("q", "").strip()
+
+    query = Product.query
+    active_category = None
+    if cat_slug in ("vegetables", "fruits"):
+        active_category = Category.query.filter_by(slug=cat_slug).first()
+        if active_category:
+            query = query.filter_by(category_id=active_category.id)
+        else:
+            cat_slug = None
+    else:
+        cat_slug = None
+
+    # Name search — stays scoped to whichever category tab is active.
+    if search_query:
+        query = query.filter(Product.name.ilike(f"%{search_query}%"))
+
+    products = query.order_by(Product.id.desc()).all()
+    return render_template(
+        "admin/dashboard.html",
+        products=products,
+        active_category=cat_slug,
+        search_query=search_query,
+    )
 
 
 @admin_bp.route("/product/new", methods=["GET", "POST"])
@@ -82,12 +116,15 @@ def new_product():
             i += 1
             slug = f"{base_slug}-{i}"
 
+        price_val = float(price)
+        mrp_val = _resolve_mrp(mrp, price_val)
+
         product = Product(
             name=name,
             slug=slug,
             category_id=int(category_id),
-            price=float(price),
-            mrp=float(mrp) if mrp else None,
+            price=price_val,
+            mrp=mrp_val,
             unit=unit,
             image=image_path,
             description=description,
@@ -129,10 +166,11 @@ def edit_product(product_id):
         if new_image_path:
             product.image = new_image_path
 
+        price_val = float(price)
         product.name = name
         product.category_id = int(category_id)
-        product.price = float(price)
-        product.mrp = float(mrp) if mrp else None
+        product.price = price_val
+        product.mrp = _resolve_mrp(mrp, price_val)
         product.unit = unit
         product.description = description
         product.stock = int(stock) if stock else 0

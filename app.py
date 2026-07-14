@@ -46,6 +46,8 @@ def create_app():
             "free_delivery_threshold": Config.FREE_DELIVERY_THRESHOLD,
             # Signed-in Google user (or None) — available in every template.
             "current_user": session.get("user"),
+            # Raw cart ({ "id|weight": qty }) so cards can show the qty stepper.
+            "cart": guest_cart,
         }
 
     @app.errorhandler(404)

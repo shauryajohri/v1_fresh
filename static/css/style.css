@@ -120,10 +120,12 @@ a:focus-visible, button:focus-visible, input:focus-visible {
     font-size: 0.95rem;
     overflow: hidden;
     max-height: 100px;
-    transition: max-height 0.35s ease, opacity 0.3s ease;
+    transition: transform 0.3s ease, max-height 0.3s ease, opacity 0.25s ease;
+    will-change: transform;
 }
 .topbar.is-hidden {
     max-height: 0;
+    transform: translateY(-100%);
     opacity: 0;
 }
 .topbar-inner {
@@ -473,7 +475,10 @@ a:focus-visible, button:focus-visible, input:focus-visible {
     position: absolute;
     inset: 0;
     opacity: 0;
-    transition: opacity 0.6s ease;
+    transition: opacity 0.7s ease-in-out;
+    will-change: opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
     display: block;
     pointer-events: none;
     z-index: 1;
@@ -661,10 +666,9 @@ a:focus-visible, button:focus-visible, input:focus-visible {
     position: relative;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    transition: border-color 0.2s ease, transform 0.2s ease;
 }
-.product-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+.product-card:hover { transform: translateY(-3px); border-color: var(--green-600); }
 
 .card-badges {
     position: absolute;
@@ -793,6 +797,35 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 }
 .btn-add-cart-full:hover { background: var(--green-700); }
 .btn-add-cart-full:disabled { background: var(--border); color: var(--ink-soft); cursor: not-allowed; }
+
+/* Product-card quantity stepper (shown after Add to cart) */
+.card-cart-control { margin-top: auto; }
+.card-cart-control .btn-add-cart-full { margin-top: 0; }
+.card-qty-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background: var(--green-600);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    user-select: none;
+}
+.card-qty-btn {
+    background: transparent;
+    border: none;
+    color: var(--white);
+    width: 44px;
+    height: 38px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+.card-qty-btn:hover { background: var(--green-700); }
+.card-qty-value { color: var(--white); font-weight: 700; font-size: 0.95rem; min-width: 28px; text-align: center; }
+[hidden] { display: none !important; }
 
 .empty-note { color: var(--ink-soft); grid-column: 1 / -1; text-align: center; padding: 40px 0; }
 
@@ -1046,16 +1079,15 @@ mark {
 /* ===========================================
    Auth / Login page
    =========================================== */
-.auth-body .site-header { display: none; }
 .auth-page {
-    background: linear-gradient(180deg, #1a9b4b 0%, #57bd7e 22%, #cfe9d8 40%, #ffffff 55%);
+    background: linear-gradient(180deg, var(--green-50) 0%, var(--cream) 55%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 44px 16px 64px;
-    min-height: 78vh;
+    padding: 48px 16px 64px;
+    min-height: 66vh;
 }
-.auth-logo { display: block; margin-bottom: 26px; }
+.auth-logo { display: none; }
 .auth-logo img { height: 74px; width: auto; }
 .auth-card {
     width: 100%;

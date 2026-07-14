@@ -1,3 +1,19 @@
+# =============================================================
+#  v1fresh — Python dependencies
+#
+#  INSTALL EVERYTHING WITH THIS ONE COMMAND (copy & run):
+#
+#      pip install -r requirements.txt
+#
+#  Optional but recommended — make a virtual environment first:
+#      Windows:    python -m venv venv && venv\Scripts\activate
+#      Mac/Linux:  python3 -m venv venv && source venv/bin/activate
+#
+#  Then run the site:
+#      python seed.py     # first time only — builds v1fresh.db
+#      python app.py      # starts http://localhost:5000
+# =============================================================
+
 Flask==3.0.3
 Flask-SQLAlchemy==3.1.1
 Werkzeug==3.0.3

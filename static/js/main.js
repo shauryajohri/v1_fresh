@@ -88,10 +88,73 @@ if (topbarEl) {
         if (badge) badge.textContent = count;
     }
 
+    // ── Product-card quantity control: "Add to cart" ⇄ − qty + ─────
+    function cardWeight(control) {
+        const card = control.closest(".product-card");
+        const sel = card && card.querySelector(".weight-chip.is-selected");
+        if (sel) return sel.dataset.label || "";
+        const any = card && card.querySelector(".weight-chip");
+        return any ? (any.dataset.label || "") : "";
+    }
+    function cardQty(productId, weight) {
+        const cart = window.V1_CART || {};
+        return cart[productId + "|" + weight] || 0;
+    }
+    function renderCardControl(control, qty) {
+        const addBtn = control.querySelector(".btn-add-cart-full");
+        const stepper = control.querySelector(".card-qty-stepper");
+        const valEl = control.querySelector(".card-qty-value");
+        if (!addBtn || !stepper) return;
+        addBtn.hidden = qty > 0;
+        stepper.hidden = qty <= 0;
+        if (valEl) valEl.textContent = qty > 0 ? qty : 0;
+    }
+    async function setCardQty(control, newQty) {
+        const productId = control.dataset.productId;
+        const weight = cardWeight(control);
+        try {
+            const res = await fetch("/cart/update", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ product_id: parseInt(productId), weight_label: weight, quantity: newQty }),
+            });
+            const data = await res.json();
+            if (!data.ok) return;
+            window.V1_CART = window.V1_CART || {};
+            const key = productId + "|" + weight;
+            if (data.quantity > 0) window.V1_CART[key] = data.quantity;
+            else delete window.V1_CART[key];
+            renderCardControl(control, data.quantity);
+            updateBadge(data.cart_count);
+        } catch (e) { /* network error — ignore */ }
+    }
+    // Reflect existing cart quantities on load.
+    document.querySelectorAll(".card-cart-control").forEach((control) => {
+        renderCardControl(control, cardQty(control.dataset.productId, cardWeight(control)));
+    });
+    // Stepper +/- clicks.
+    document.body.addEventListener("click", (e) => {
+        const inc = e.target.closest("[data-action='card-inc']");
+        const dec = e.target.closest("[data-action='card-dec']");
+        if (!inc && !dec) return;
+        const control = (inc || dec).closest(".card-cart-control");
+        if (!control) return;
+        const cur = cardQty(control.dataset.productId, cardWeight(control));
+        setCardQty(control, inc ? cur + 1 : cur - 1);
+    });
+
     // ── ADD button handler (works on all pages) ────────────────
     document.body.addEventListener("click", async (e) => {
         const btn = e.target.closest("[data-action='add']");
         if (!btn) return;
+
+        // Product cards: switch to the quantity stepper instead of a one-shot add.
+        const cardControl = btn.closest(".card-cart-control");
+        if (cardControl) {
+            const cur = cardQty(cardControl.dataset.productId, cardWeight(cardControl));
+            setCardQty(cardControl, cur + 1);
+            return;
+        }
 
         const productId = btn.dataset.productId;
         if (!productId) return;
@@ -205,6 +268,9 @@ if (topbarEl) {
             if (priceEl && !isNaN(basePrice) && !isNaN(fraction)) {
                 priceEl.textContent = "₹" + Math.round(basePrice * fraction);
             }
+            // Re-sync the add/stepper control for the newly selected weight.
+            const ctrl = card ? card.querySelector(".card-cart-control") : null;
+            if (ctrl) renderCardControl(ctrl, cardQty(ctrl.dataset.productId, chip.dataset.label));
         }
 
         // Product detail page weight chips
