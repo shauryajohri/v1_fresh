@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin · v1fresh{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='20260714b') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css', v='20260714d') }}">
+</head>
+<body class="admin-body">
+    <header class="admin-topbar">
+        <div class="admin-topbar-inner">
+            <span class="admin-brand"><span class="brand-mark">v1</span><span class="brand-rest">fresh</span> <span class="admin-tag">Admin</span></span>
+            <div class="admin-topbar-actions">
+                <a href="{{ url_for('main.home') }}" class="admin-back-link">← Back to site</a>
+                {% if session.get('is_admin') %}
+                <form method="post" action="{{ url_for('admin.logout') }}" class="admin-logout-form">
+                    <button type="submit" class="admin-back-link admin-logout-btn">Logout</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="admin-flash-wrap">
+                {% for category, message in messages %}
+                <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="admin-toggle">
+            <a href="{{ url_for('admin.products') }}" class="admin-toggle-btn {{ 'active' if active_view == 'products' }}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                Product
+            </a>
+            <a href="{{ url_for('admin.customers') }}" class="admin-toggle-btn {{ 'active' if active_view == 'customers' }}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Customer
+            </a>
+        </div>
+
+        {% block admin_content %}{% endblock %}
+    </main>
+</body>
+</html>

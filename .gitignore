@@ -8,8 +8,11 @@ __pycache__/
 # Database
 *.db
 *.db.bak
-# ...but DO ship the pre-seeded catalog DB — the read-only Vercel demo needs it.
+# ...but DO ship the pre-seeded catalog DB so a fresh clone has data to show.
 !v1fresh.db
+
+# Secrets — never commit
+.env
 
 # IDE
 .idea/

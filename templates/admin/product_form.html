@@ -13,7 +13,7 @@
     <header class="admin-topbar">
         <div class="admin-topbar-inner">
             <span class="admin-brand"><span class="brand-mark">v1</span><span class="brand-rest">fresh</span> <span class="admin-tag">Admin</span></span>
-            <a href="{{ url_for('admin.dashboard') }}" class="admin-back-link">← Back to inventory</a>
+            <a href="{{ url_for('admin.products') }}" class="admin-back-link">← Back to inventory</a>
         </div>
     </header>
 
@@ -111,7 +111,7 @@
 
             <div class="admin-form-actions">
                 <button type="submit" class="btn btn-primary">{{ "Save Changes" if mode == "edit" else "Add Product" }}</button>
-                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost">Cancel</a>
+                <a href="{{ url_for('admin.products') }}" class="btn btn-ghost">Cancel</a>
             </div>
         </form>
     </main>

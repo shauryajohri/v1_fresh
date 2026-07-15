@@ -1,7 +1,29 @@
-from flask import Blueprint, render_template, Response, request
-from models import Category, Product, current_season
+import json
+from flask import Blueprint, render_template, Response, request, session, jsonify
+from extensions import db
+from models import Category, Product, current_season, User
 
 main_bp = Blueprint("main", __name__)
+
+
+@main_bp.route("/wishlist/save", methods=["POST"])
+def wishlist_save():
+    """Persist the wishlist to the signed-in user's account (from the browser)."""
+    data = request.get_json(silent=True) or {}
+    ids = data.get("ids", [])
+    if not isinstance(ids, list):
+        ids = []
+    session["wishlist_ids"] = ids
+    info = session.get("user")
+    if info and info.get("id"):
+        try:
+            user = User.query.get(info["id"])
+            if user:
+                user.wishlist_data = json.dumps(ids)
+                db.session.commit()
+        except Exception:
+            db.session.rollback()
+    return jsonify({"ok": True})
 
 # Fixed subtitle text per category slug, shown under each category's
 # spotlight heading on the homepage (e.g. "Aloo, Pyaz, Tamatar & more...").
@@ -24,14 +46,14 @@ def home():
     featured_products = (
         Product.query.filter_by(is_featured=True)
         .order_by(Product.id)
-        .limit(8)
+        .limit(12)
         .all()
     )
     season = current_season()
     seasonal_products = (
         Product.query.filter_by(season=season)
         .order_by(Product.id)
-        .limit(4)
+        .limit(6)
         .all()
     )
 
@@ -47,7 +69,7 @@ def home():
         cat_products = (
             Product.query.filter_by(category_id=cat.id)
             .order_by(Product.id)
-            .limit(6)
+            .limit(12)
             .all()
         )
         if cat_products:

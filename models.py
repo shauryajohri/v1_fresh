@@ -1,7 +1,11 @@
 import random
 import string
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from extensions import db
+
+# India Standard Time (UTC+5:30, no DST) — used to pick the current season by
+# the real local date, so Seasonal Picks update automatically as months change.
+IST = timezone(timedelta(hours=5, minutes=30))
 
 
 # Weight/size chips shown on product cards, and the fraction of the product's
@@ -98,10 +102,10 @@ class Product(db.Model):
 
 def current_season():
     """
-    India-appropriate season buckets, based on today's month:
+    India-appropriate season buckets, based on today's month (IST):
     Winter: Nov-Feb, Summer: Mar-Jun, Monsoon: Jul-Oct.
     """
-    month = datetime.utcnow().month
+    month = datetime.now(IST).month
     if month in (11, 12, 1, 2):
         return "winter"
     elif month in (3, 4, 5, 6):
@@ -124,6 +128,7 @@ class Order(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     order_number = db.Column(db.String(20), unique=True, nullable=False, default=generate_order_number)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)  # set if logged in
 
     # contact + shipping details, collected directly at checkout (no saved address book)
     name = db.Column(db.String(120), nullable=False)
@@ -163,3 +168,22 @@ class OrderItem(db.Model):
     @property
     def line_total(self):
         return round(self.price_at_purchase * self.quantity, 2)
+
+
+class User(db.Model):
+    """Accounts created via email/password or phone-OTP login.
+    (Google sign-ins are kept in the session only and don't need a row.)"""
+    __tablename__ = "users"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(255), unique=True, nullable=True)
+    phone = db.Column(db.String(20), unique=True, nullable=True)
+    password_hash = db.Column(db.String(255), nullable=True)
+    picture = db.Column(db.String(500), nullable=True)      # avatar URL (Google)
+    cart_data = db.Column(db.Text, nullable=True)           # saved cart as JSON
+    wishlist_data = db.Column(db.Text, nullable=True)       # saved wishlist (JSON list of product IDs)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<User {self.email or self.phone}>"

@@ -26,15 +26,13 @@
             {% endfor %}
         </div>
 
-        <div class="cart-summary">
+        <div class="cart-summary" data-delivery-fee="{{ delivery_fee }}">
             <h3>Order Summary</h3>
-            {% if amount_for_free_delivery > 0 %}
-            <p class="free-delivery-hint">Add ₹{{ "%.0f"|format(amount_for_free_delivery) }} more for free delivery</p>
-            {% endif %}
+            <p class="free-delivery-hint" id="freeDeliveryHint" {{ 'hidden' if amount_for_free_delivery <= 0 }}>Add ₹{{ "%.0f"|format(amount_for_free_delivery) }} more for free delivery</p>
             <div class="summary-row"><span>Subtotal</span><span id="cartSubtotal">₹{{ "%.0f"|format(subtotal) }}</span></div>
             <div class="summary-row"><span>Delivery</span><span id="cartDeliveryFee">{{ "₹%.0f"|format(delivery_fee) if delivery_fee > 0 else "FREE" }}</span></div>
             <div class="summary-row summary-total"><span>Total</span><span id="cartTotal">₹{{ "%.0f"|format(total) }}</span></div>
-            <a href="{{ url_for('orders.checkout') }}" class="btn btn-primary btn-full">Proceed to Checkout</a>
+            <a href="{{ url_for('orders.checkout') }}" data-action="checkout-link" class="btn btn-primary btn-full">Proceed to Checkout</a>
         </div>
     </div>
     {% else %}

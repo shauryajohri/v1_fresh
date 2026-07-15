@@ -15,14 +15,8 @@
 
             <h3 class="season-filter-heading">Season</h3>
             <ul class="sidebar-cat-list">
-                <li><a href="{{ url_for('products.listing', category=active_category.slug if active_category else None) }}" class="{{ 'active' if not active_season else '' }}">All Seasons</a></li>
-                {% for s in ["winter", "summer", "monsoon", "all-season"] %}
-                <li>
-                    <a href="{{ url_for('products.listing', category=active_category.slug if active_category else None, season=s) }}" class="{{ 'active' if active_season == s else '' }}">
-                        {{ s.replace('-', ' ')|title }}{{ " (current)" if s == current_season else "" }}
-                    </a>
-                </li>
-                {% endfor %}
+                <li><a href="{{ url_for('products.listing', category=active_category.slug if active_category else None) }}" class="{{ 'active' if not active_season else '' }}">All Season</a></li>
+                <li><a href="{{ url_for('products.listing', category=active_category.slug if active_category else None, season='seasonal') }}" class="{{ 'active' if active_season == 'seasonal' else '' }}">Seasonal</a></li>
             </ul>
 
             <h3 class="season-filter-heading">Price Range</h3>

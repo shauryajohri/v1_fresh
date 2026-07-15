@@ -1,6 +1,8 @@
+import json
 from flask import Blueprint, render_template, session, request, jsonify
 from config import Config
-from models import Product, weight_fraction, default_weight_label
+from extensions import db
+from models import Product, weight_fraction, default_weight_label, User
 
 cart_bp = Blueprint("cart", __name__, url_prefix="/cart")
 
@@ -28,6 +30,22 @@ def _get_cart():
 def _save_cart(cart):
     session["cart"] = cart
     session.modified = True
+    _persist_user_cart(cart)
+
+
+def _persist_user_cart(cart):
+    """When a user is signed in, mirror their cart to their account so it's
+    restored next time they log in. No-op for guests; safe on read-only DBs."""
+    info = session.get("user")
+    if not info or not info.get("id"):
+        return
+    try:
+        user = User.query.get(info["id"])
+        if user:
+            user.cart_data = json.dumps(cart)
+            db.session.commit()
+    except Exception:
+        db.session.rollback()
 
 
 def _cart_count(cart):
@@ -109,6 +127,11 @@ def add_to_cart():
     cart[cart_key] = cart.get(cart_key, 0) + quantity
     _save_cart(cart)
 
+    # Recompute so pages outside the cart (product listing/detail) can also
+    # react live to crossing the free-delivery threshold.
+    _, subtotal = _build_cart_items(cart)
+    delivery_fee = 0 if subtotal >= Config.FREE_DELIVERY_THRESHOLD or subtotal == 0 else Config.DELIVERY_FEE
+
     return jsonify({
         "ok": True,
         "product_id": product_id,
@@ -116,6 +139,8 @@ def add_to_cart():
         "quantity": cart[cart_key],
         "unit_price": _unit_price(product, weight_label),
         "cart_count": _cart_count(cart),
+        "subtotal": subtotal,
+        "delivery_fee": delivery_fee,
     })
 
 

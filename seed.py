@@ -46,6 +46,7 @@ CATEGORIES = [
     {"name": "Leafy Greens", "slug": "leafy-greens", "image": "/static/images/cat-leafy.svg", "sort_order": 3},
     {"name": "Exotic", "slug": "exotic", "image": "/static/images/cat-exotic.svg", "sort_order": 4},
     {"name": "Dairy & Eggs", "slug": "dairy-eggs", "image": "/static/images/cat-dairy.svg", "sort_order": 6},
+    {"name": "Herbs & Spices", "slug": "herbs-spices", "image": "/static/images/cat-herbs.svg", "sort_order": 7},
 ]
 
 PRODUCTS = PRODUCTS = [

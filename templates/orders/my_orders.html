@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}My Orders - v1fresh{% endblock %}
+{% block content %}
+<section class="myorders-page container">
+    <div class="myorders-head">
+        <h1>My Orders</h1>
+        {% if orders %}<span class="myorders-summary">{{ orders|length }} orders · ₹{{ "%.0f"|format(total_spent) }} total</span>{% endif %}
+    </div>
+
+    {% if not orders %}
+    <div class="myorders-empty">
+        <p>You haven't placed any orders yet.</p>
+        <a href="{{ url_for('products.listing') }}" class="btn btn-primary">Start shopping</a>
+    </div>
+    {% else %}
+    {% for order in orders %}
+    <div class="myorder-card">
+        <div class="myorder-head">
+            <span><strong>{{ order.order_number }}</strong> · {{ order.created_at.strftime('%d %b %Y, %I:%M %p') if order.created_at else "" }}</span>
+            <span class="myorder-total">₹{{ "%.2f"|format(order.total) }}</span>
+        </div>
+        <div class="myorder-items">
+            {% for it in order.items %}
+            <div class="myorder-item">
+                <span>{{ it.product_name.split('(')[0].strip() }} <small>({{ it.unit }}) × {{ it.quantity }}</small></span>
+                <span>₹{{ "%.2f"|format(it.line_total) }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="myorder-foot">
+            <span class="myorder-status">{{ order.status }}</span> · {{ order.payment_method }} · Deliver to {{ order.city }} {{ order.pincode }}
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+</section>
+{% endblock %}

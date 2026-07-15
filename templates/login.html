@@ -3,47 +3,139 @@
 {% block body_class %}auth-body{% endblock %}
 
 {% block content %}
+{% set tab = active_tab or 'phone' %}
+{% set firebase_on = config.FIREBASE_API_KEY and not config.PHONE_DEMO_MODE %}
 <section class="auth-page">
-    <a href="{{ url_for('main.home') }}" class="auth-logo">
-        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="V1 Fresh - Premium Quality Wholesale Price">
-    </a>
-
     <div class="auth-card">
-        <h1 class="auth-title">Sign in with SMS OTP</h1>
-        <p class="auth-subtitle">We'll send a one-time code via SMS</p>
+        <h1 class="auth-title">Sign in to v1fresh</h1>
+        <p class="auth-subtitle">Welcome! Choose how you'd like to continue.</p>
 
-        <form class="auth-form" data-demo-method="SMS OTP">
-            <div class="auth-input">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.61 21 3 13.39 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.58a1 1 0 0 1-.25 1.02z"/></svg>
-                <span class="auth-input-prefix">+91</span>
-                <input type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number" autocomplete="tel">
+        {% if not otp_stage %}
+        <div class="auth-tabs">
+            <button type="button" class="auth-tab {{ 'active' if tab == 'phone' }}" data-tab="phone">Phone</button>
+            <button type="button" class="auth-tab {{ 'active' if tab == 'email' }}" data-tab="email">Email</button>
+        </div>
+        {% endif %}
+
+        <!-- ── PHONE ─────────────────────────────────────────── -->
+        <div class="auth-panel" data-panel="phone" {{ 'hidden' if tab != 'phone' }}>
+            {% if firebase_on %}
+            <div id="fbStep1">
+                <div class="auth-input">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.61 21 3 13.39 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.58a1 1 0 0 1-.25 1.02z"/></svg>
+                    <span class="auth-input-prefix">+91</span>
+                    <input id="fbPhone" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number" autocomplete="tel">
+                </div>
+                <div class="auth-input">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <input id="fbName" type="text" placeholder="Full name (required for new users)" autocomplete="name">
+                </div>
+                <button id="fbSendBtn" type="button" class="auth-btn auth-btn-blue">Send OTP</button>
+                <p class="auth-hint">A real 6-digit code will be texted to your number.</p>
             </div>
-            <div class="auth-input">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                <input type="text" placeholder="Full name (required for new users)" autocomplete="name">
+            <div id="fbStep2" hidden>
+                <p class="auth-subtitle" id="fbSentTo" style="margin:6px 0 16px"></p>
+                <div class="auth-input">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <input id="fbOtp" type="text" inputmode="numeric" maxlength="6" placeholder="6-digit code" autocomplete="one-time-code">
+                </div>
+                <button id="fbVerifyBtn" type="button" class="auth-btn auth-btn-blue">Verify &amp; Sign in</button>
+                <a href="#" id="fbBack" class="auth-back-inline">← Use a different number</a>
             </div>
-            <button type="submit" class="auth-btn auth-btn-blue">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
-                Send OTP via SMS
-            </button>
-            <p class="auth-hint">A 6-digit OTP will be sent to this number via SMS.</p>
-        </form>
+            <div id="fbError" class="auth-note" hidden></div>
+            <p id="fbStatus" class="auth-hint" style="color:var(--green-700);font-weight:600"></p>
+            <div id="recaptcha-container"></div>
+
+            {% elif otp_stage %}
+            {% if demo_otp %}
+            <div class="auth-note" style="display:block">Demo mode (no SMS gateway connected): your code is <strong>{{ demo_otp }}</strong></div>
+            {% endif %}
+            <p class="auth-subtitle" style="margin-top:14px">Enter the 6-digit code for +91 {{ otp_phone }}</p>
+            <form class="auth-form" method="post" action="{{ url_for('auth.phone_verify') }}">
+                <div class="auth-input">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <input type="text" name="otp" inputmode="numeric" maxlength="6" placeholder="6-digit code" required autofocus>
+                </div>
+                <button type="submit" class="auth-btn auth-btn-blue">Verify &amp; Sign in</button>
+            </form>
+            <a href="{{ url_for('auth.login') }}" class="auth-back-inline">← Use a different number</a>
+
+            {% else %}
+            <form class="auth-form" method="post" action="{{ url_for('auth.phone_send') }}">
+                <div class="auth-input">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.61 21 3 13.39 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.58a1 1 0 0 1-.25 1.02z"/></svg>
+                    <span class="auth-input-prefix">+91</span>
+                    <input type="tel" name="phone" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number" required>
+                </div>
+                <div class="auth-input">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <input type="text" name="name" placeholder="Full name (required for new users)">
+                </div>
+                <button type="submit" class="auth-btn auth-btn-blue">Send OTP</button>
+                <p class="auth-hint">Demo mode — the code is shown on screen (add Firebase keys for real SMS).</p>
+            </form>
+            {% endif %}
+        </div>
+
+        <!-- ── EMAIL ─────────────────────────────────────────── -->
+        {% if not otp_stage %}
+        <div class="auth-panel" data-panel="email" {{ 'hidden' if tab != 'email' }}>
+            {% if email_otp_stage %}
+            {% if email_demo_otp %}
+            <div class="auth-note" style="display:block">Email not configured (demo): your code is <strong>{{ email_demo_otp }}</strong></div>
+            {% endif %}
+            <p class="auth-subtitle" style="margin:12px 0 16px">Enter the 6-digit code sent to {{ email_otp_addr }}</p>
+            <form class="auth-form" method="post" action="{{ url_for('auth.email_otp_verify') }}">
+                <div class="auth-input">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <input type="text" name="otp" inputmode="numeric" maxlength="6" placeholder="6-digit code" required autofocus>
+                </div>
+                <button type="submit" class="auth-btn auth-btn-blue">Verify &amp; Sign in</button>
+            </form>
+            <a href="{{ url_for('auth.login') }}" class="auth-back-inline">← Use a different email</a>
+            {% else %}
+            <form class="auth-form" method="post" action="{{ url_for('auth.email_login') }}">
+                <div class="auth-input">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+                    <input type="email" name="email" placeholder="Email address" autocomplete="email" required>
+                </div>
+                <div class="auth-input">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <input type="password" name="password" placeholder="Password" autocomplete="current-password" required>
+                </div>
+                <div class="auth-input">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <input type="text" name="name" placeholder="Full name (new accounts only)" autocomplete="name">
+                </div>
+                <button type="submit" class="auth-btn auth-btn-blue">Sign in / Create account</button>
+                <p class="auth-hint">New email? We'll create your account. Returning? We'll log you in.</p>
+            </form>
+            <div class="auth-divider"><span>OR VERIFY BY EMAIL CODE</span></div>
+            <form class="auth-form" method="post" action="{{ url_for('auth.email_otp_send') }}">
+                <div class="auth-input">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+                    <input type="email" name="email" placeholder="Email address" autocomplete="email" required>
+                </div>
+                <div class="auth-input">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <input type="text" name="name" placeholder="Full name (new users)" autocomplete="name">
+                </div>
+                <button type="submit" class="auth-btn auth-btn-outline">Email me a login code</button>
+            </form>
+            {% endif %}
+        </div>
+        {% endif %}
 
         <div class="auth-divider"><span>OR CONTINUE WITH</span></div>
-
-        <a href="https://wa.me/919643551177" target="_blank" rel="noopener" class="auth-btn auth-btn-whatsapp" data-demo-method="WhatsApp">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm4.5 12.1c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.6.8-.8 1-.1.2-.3.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.2 0-.4.1-.5l.4-.4c.1-.1.2-.3.2-.4 0-.1 0-.3 0-.4-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.4c.1.2 1.6 2.4 3.8 3.4.5.2.9.4 1.3.5.5.2 1 .1 1.4.1.4-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1-.1-.1-.2-.1-.4-.2z"/></svg>
-            Continue with WhatsApp
-        </a>
-
-        <button type="button" class="auth-btn auth-btn-outline" data-demo-method="Email & Password">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
-            Use Email &amp; Password
-        </button>
 
         <a href="{{ url_for('auth.google_login') }}" class="auth-btn auth-btn-outline auth-btn-google">
             <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15A10.5 10.5 0 0 0 12 1 11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38z"/></svg>
             Continue with Google
+        </a>
+
+        <a href="https://wa.me/919643551177?text=Hi%20v1fresh%2C%20I%20need%20help" target="_blank" rel="noopener" class="auth-btn auth-btn-whatsapp">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm4.5 12.1c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.6.8-.8 1-.1.2-.3.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.2 0-.4.1-.5l.4-.4c.1-.1.2-.3.2-.4 0-.1 0-.3 0-.4-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.4c.1.2 1.6 2.4 3.8 3.4.5.2.9.4 1.3.5.5.2 1 .1 1.4.1.4-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1-.1-.1-.2-.1-.4-.2z"/></svg>
+            Chat on WhatsApp
         </a>
 
         <div class="auth-note" id="authNote" hidden></div>
@@ -59,21 +151,122 @@
 
 {% block extra_scripts %}
 <script>
-// Only Google sign-in is wired to a backend. The other options are shown for
-// the intended design; tell the user politely until an SMS/email service is added.
 (function () {
+    const tabs = document.querySelectorAll('.auth-tab');
+    const panels = document.querySelectorAll('.auth-panel');
+    tabs.forEach(function (t) {
+        t.addEventListener('click', function () {
+            const which = t.dataset.tab;
+            tabs.forEach(function (x) { x.classList.toggle('active', x === t); });
+            panels.forEach(function (p) { p.hidden = (p.dataset.panel !== which); });
+        });
+    });
     const note = document.getElementById('authNote');
-    function showNote(method) {
-        if (!note) return;
-        note.textContent = method + " sign-in isn't set up yet — please continue with Google for now.";
-        note.hidden = false;
-    }
     document.querySelectorAll('[data-demo-method]').forEach(function (el) {
-        el.addEventListener(el.tagName === 'FORM' ? 'submit' : 'click', function (e) {
+        el.addEventListener('click', function (e) {
             e.preventDefault();
-            showNote(el.getAttribute('data-demo-method'));
+            if (note) { note.textContent = el.getAttribute('data-demo-method') + " sign-in isn't set up yet — use Phone, Email, or Google."; note.hidden = false; }
         });
     });
 })();
 </script>
+
+{% if firebase_on %}
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script>
+(function () {
+    var sendBtn = document.getElementById('fbSendBtn');
+    var verifyBtn = document.getElementById('fbVerifyBtn');
+    var backBtn = document.getElementById('fbBack');
+    var errEl = document.getElementById('fbError');
+    var step1 = document.getElementById('fbStep1');
+    var step2 = document.getElementById('fbStep2');
+    var phoneEl = document.getElementById('fbPhone');
+    var nameEl = document.getElementById('fbName');
+    var otpEl = document.getElementById('fbOtp');
+    var sentTo = document.getElementById('fbSentTo');
+    var confirmation = null, recaptcha = null, inited = false;
+
+    function showErr(m) { if (errEl) { errEl.textContent = m; errEl.hidden = false; } console.error('[v1fresh]', m); }
+    function clearErr() { if (errEl) errEl.hidden = true; }
+
+    function initFirebase() {
+        if (inited) return true;
+        if (typeof firebase === 'undefined' || !firebase.auth) {
+            showErr('Firebase SDK did not load — check your internet or disable ad-blockers, then refresh.');
+            return false;
+        }
+        try {
+            if (!firebase.apps || !firebase.apps.length) {
+                firebase.initializeApp({
+                    apiKey: "{{ config.FIREBASE_API_KEY }}",
+                    authDomain: "{{ config.FIREBASE_AUTH_DOMAIN }}",
+                    projectId: "{{ config.FIREBASE_PROJECT_ID }}",
+                    appId: "{{ config.FIREBASE_APP_ID }}"
+                });
+            }
+            inited = true;
+            return true;
+        } catch (e) { showErr('Firebase init failed: ' + (e.message || e)); return false; }
+    }
+
+    if (sendBtn) sendBtn.addEventListener('click', function () {
+        clearErr();
+        var phone = (phoneEl.value || '').replace(/\D/g, '').slice(-10);
+        if (phone.length !== 10) { showErr('Please enter a valid 10-digit number.'); return; }
+        if (!initFirebase()) return;
+        sendBtn.disabled = true; sendBtn.textContent = 'Sending…';
+        try {
+            if (!recaptcha) recaptcha = new firebase.auth.RecaptchaVerifier('recaptcha-container', { size: 'invisible' });
+        } catch (e) {
+            showErr('reCAPTCHA setup error: ' + (e.message || e));
+            sendBtn.disabled = false; sendBtn.textContent = 'Send OTP'; return;
+        }
+        firebase.auth().signInWithPhoneNumber('+91' + phone, recaptcha)
+            .then(function (r) {
+                confirmation = r;
+                if (sentTo) sentTo.textContent = 'Code sent to +91 ' + phone;
+                step1.hidden = true; step2.hidden = false;
+                sendBtn.disabled = false; sendBtn.textContent = 'Send OTP';
+            })
+            .catch(function (e) {
+                showErr((e && e.code ? e.code + ' — ' : '') + (e && e.message ? e.message : 'Could not send the code.'));
+                sendBtn.disabled = false; sendBtn.textContent = 'Send OTP';
+                try { if (recaptcha) { recaptcha.clear(); recaptcha = null; } } catch (_) {}
+            });
+    });
+
+    if (verifyBtn) verifyBtn.addEventListener('click', function () {
+        clearErr();
+        if (!confirmation) { showErr('Please request a code first.'); return; }
+        verifyBtn.disabled = true; verifyBtn.textContent = 'Verifying…';
+        confirmation.confirm((otpEl.value || '').trim())
+            .then(function (result) { return result.user.getIdToken(); })
+            .then(function (idToken) {
+                return fetch('/login/phone/firebase', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone: phoneEl.value, name: nameEl.value, id_token: idToken })
+                });
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.ok) { window.location.href = data.redirect || '/'; }
+                else { showErr(data.error || 'Sign-in failed.'); verifyBtn.disabled = false; verifyBtn.textContent = 'Verify & Sign in'; }
+            })
+            .catch(function (e) { showErr('Invalid code — please try again. (' + (e && e.code ? e.code : '') + ')'); verifyBtn.disabled = false; verifyBtn.textContent = 'Verify & Sign in'; });
+    });
+
+    if (backBtn) backBtn.addEventListener('click', function (e) {
+        e.preventDefault(); step2.hidden = true; step1.hidden = false; clearErr();
+    });
+
+    // Visible proof this script ran and the button is wired up.
+    var statusEl = document.getElementById('fbStatus');
+    if (statusEl) statusEl.textContent = (typeof firebase !== 'undefined')
+        ? '✓ Real SMS mode active — enter your number and tap Send OTP.'
+        : '⚠ Firebase SDK not loaded (check internet / ad-blocker).';
+})();
+</script>
+{% endif %}
 {% endblock %}

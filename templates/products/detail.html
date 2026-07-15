@@ -65,11 +65,6 @@
     {% endif %}
 </div>
 
-<div class="product-description-block">
-    <h3 class="product-description-title">Product Description</h3>
-    <p class="product-description">{{ product.description or "Fresh, hand-picked, and delivered same day." }}</p>
-</div>
-
 {% if product.in_stock %}
 <div class="detail-qty-section">
     <span class="detail-weight-label">Quantity</span>
@@ -92,7 +87,7 @@
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
         Add to Cart
     </button>
-    <button class="btn-save" type="button" data-action="wishlist" aria-label="Save for later">
+    <button class="btn-save" type="button" data-action="wishlist" data-product-id="{{ product.id }}" aria-label="Save for later">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-6.7-4.35-9.3-8.1C.8 10 1.4 6.4 4.6 5 7 4 9.6 4.9 12 7.6 14.4 4.9 17 4 19.4 5c3.2 1.4 3.8 5 1.9 7.9C18.7 16.65 12 21 12 21z"/></svg>
         Save
     </button>
@@ -101,23 +96,89 @@
 <p class="out-of-stock-msg">Currently out of stock — check back soon.</p>
 {% endif %}
 
-            <ul class="product-perks-list">
-                <li>✓ Sourced fresh same morning</li>
-                <li>✓ Quality checked before dispatch</li>
-                <li>✓ Easy replacement if not satisfied</li>
-            </ul>
+            <div class="product-description-block">
+                <h3 class="product-description-title">Product Description</h3>
+                <p class="product-description">{{ product.description or "Fresh, hand-picked, and delivered same day." }}</p>
+            </div>
         </div>
     </div>
 
     {% if related %}
-    <div class="related-section">
+    <div class="related-section"
+         id="relatedSection"
+         data-related-url="{{ url_for('products.related_more', slug=product.slug) }}"
+         data-seed="{{ related_seed }}"
+         data-offset="{{ related|length }}"
+         data-has-more="{{ 'true' if related_has_more else 'false' }}">
         <h2>You may also like</h2>
-        <div class="product-grid">
+        <div class="product-grid" id="relatedGrid">
             {% for product in related %}
                 {% include "partials/_product_card.html" %}
             {% endfor %}
         </div>
+        <div id="relatedSentinel" class="related-sentinel" aria-hidden="true"></div>
+        <p id="relatedLoading" class="related-loading" hidden>Loading more…</p>
     </div>
     {% endif %}
 </section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    var section = document.getElementById('relatedSection');
+    if (!section) return;
+
+    var grid = document.getElementById('relatedGrid');
+    var sentinel = document.getElementById('relatedSentinel');
+    var loadingEl = document.getElementById('relatedLoading');
+    var url = section.dataset.relatedUrl;
+    var seed = section.dataset.seed;
+    var offset = parseInt(section.dataset.offset, 10) || 0;
+    var hasMore = section.dataset.hasMore === 'true';
+    var isLoading = false;
+
+    function loadMore() {
+        if (isLoading || !hasMore) return;
+        isLoading = true;
+        if (loadingEl) loadingEl.hidden = false;
+
+        var qs = new URLSearchParams({ seed: seed, offset: offset, limit: 4 });
+        fetch(url + '?' + qs.toString())
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.html) {
+                    var wrap = document.createElement('div');
+                    wrap.innerHTML = data.html;
+                    while (wrap.firstChild) grid.appendChild(wrap.firstChild);
+                }
+                hasMore = !!data.has_more;
+                offset = data.next_offset || offset;
+                isLoading = false;
+                if (loadingEl) loadingEl.hidden = true;
+                if (!hasMore && observer) observer.disconnect();
+            })
+            .catch(function () {
+                isLoading = false;
+                if (loadingEl) loadingEl.hidden = true;
+            });
+    }
+
+    var observer = null;
+    if ('IntersectionObserver' in window) {
+        observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) loadMore();
+            });
+        }, { rootMargin: '200px' });
+        observer.observe(sentinel);
+    } else {
+        // Fallback for older browsers: check on scroll.
+        window.addEventListener('scroll', function () {
+            var rect = sentinel.getBoundingClientRect();
+            if (rect.top < window.innerHeight + 200) loadMore();
+        });
+    }
+})();
+</script>
 {% endblock %}

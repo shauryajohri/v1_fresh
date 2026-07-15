@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login · v1fresh</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='20260714b') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css', v='20260714d') }}">
+</head>
+<body class="admin-body">
+    <header class="admin-topbar">
+        <div class="admin-topbar-inner">
+            <span class="admin-brand"><span class="brand-mark">v1</span><span class="brand-rest">fresh</span> <span class="admin-tag">Admin</span></span>
+            <a href="{{ url_for('main.home') }}" class="admin-back-link">← Back to site</a>
+        </div>
+    </header>
+
+    <main class="admin-login-wrap">
+        <div class="admin-login-card auth-card" style="max-width:380px">
+            <h1>Admin sign in</h1>
+            <p class="admin-login-sub">Enter your admin credentials to continue.</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}" style="margin-bottom:14px">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% if error %}
+            <div class="auth-note" style="display:block; margin-bottom:14px">{{ error }}</div>
+            {% endif %}
+
+            <form class="auth-form" method="post" action="{{ url_for('admin.login') }}">
+                <div class="auth-input">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <input type="text" name="username" placeholder="Username" autocomplete="username" required autofocus>
+                </div>
+                <div class="auth-input">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <input type="password" name="password" placeholder="Password" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="auth-btn auth-btn-blue">Sign in</button>
+            </form>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,42 @@
+{% extends "admin/_base.html" %}
+{% block title %}Customers · Admin · v1fresh{% endblock %}
+{% block admin_content %}
+<div class="admin-header-row">
+    <h1>Customers</h1>
+    <span class="admin-count-pill">{{ pagination.total }} total</span>
+</div>
+
+<div class="admin-content admin-content-full">
+    <form class="admin-search" method="get" action="{{ url_for('admin.customers') }}">
+        <input type="text" name="q" value="{{ search_query }}" placeholder="Search customers by name or email…" autocomplete="off">
+        <button type="submit" class="btn btn-primary">Search</button>
+        {% if search_query %}<a href="{{ url_for('admin.customers') }}" class="admin-search-clear">Clear</a>{% endif %}
+    </form>
+
+    <div class="admin-table-wrap">
+        <table class="admin-table">
+            <thead>
+                <tr><th>Name</th><th>Email</th><th>Phone</th><th>Orders</th><th></th></tr>
+            </thead>
+            <tbody>
+                {% for row in customers %}
+                <tr>
+                    <td class="admin-product-name">
+                        {% if row.user.picture %}<img src="{{ row.user.picture }}" class="admin-avatar" referrerpolicy="no-referrer">{% endif %}
+                        {{ row.user.name }}
+                    </td>
+                    <td>{{ row.user.email or "—" }}</td>
+                    <td>{{ row.user.phone or "—" }}</td>
+                    <td><span class="admin-count-pill">{{ row.orders }}</span></td>
+                    <td class="admin-actions"><a href="{{ url_for('admin.customer_detail', user_id=row.user.id) }}" class="admin-btn-edit">View</a></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="admin-empty">{% if search_query %}No customer found{% else %}No customers have signed in yet.{% endif %}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "admin/_pager.html" %}
+</div>
+{% endblock %}

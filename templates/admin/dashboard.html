@@ -37,8 +37,9 @@
             <aside class="admin-sidebar">
                 <h3>Categories</h3>
                 <a href="{{ url_for('admin.dashboard') }}" class="admin-sidebar-link {{ 'active' if not active_category }}">All Items</a>
-                <a href="{{ url_for('admin.dashboard', category='vegetables') }}" class="admin-sidebar-link {{ 'active' if active_category == 'vegetables' }}">Vegetables</a>
-                <a href="{{ url_for('admin.dashboard', category='fruits') }}" class="admin-sidebar-link {{ 'active' if active_category == 'fruits' }}">Fruits</a>
+                {% for cat in categories %}
+                <a href="{{ url_for('admin.dashboard', category=cat.slug) }}" class="admin-sidebar-link {{ 'active' if active_category == cat.slug }}">{{ cat.name }}</a>
+                {% endfor %}
             </aside>
 
             <div class="admin-content">

@@ -1,9 +1,0 @@
-__pycache__/
-*.pyc
-.venv/
-venv/
-env/
-.git/
-static/images/products/renamed/*.tmp
-static/images/products/*.py
-DEPLOY.md

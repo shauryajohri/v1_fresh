@@ -1,6 +1,129 @@
 // v1fresh — main.js
 document.addEventListener("DOMContentLoaded", () => {
 
+// ── Toast notifications ─────────────────────────────────────
+    function showToast(message, type, ms) {
+        const container = document.getElementById("toastContainer");
+        if (!container) return;
+        const toast = document.createElement("div");
+        toast.className = "toast" + (type ? " toast-" + type : "");
+        toast.innerHTML = '<span class="toast-icon">🚚</span><span>' + message + "</span>";
+        container.appendChild(toast);
+        requestAnimationFrame(() => toast.classList.add("toast-visible"));
+        setTimeout(() => {
+            toast.classList.remove("toast-visible");
+            setTimeout(() => toast.remove(), 300);
+        }, ms || 4000);
+    }
+
+    // ── Free-delivery progress (cart hint + "you unlocked it" toast) ────
+    // Tracks the delivery fee we last saw *this page load* so the toast only
+    // fires the moment the cart actually crosses the threshold — not on
+    // every page load where it's already free.
+    let lastDeliveryFee = null;
+    (function initFreeDeliveryTracking() {
+        const summary = document.querySelector(".cart-summary[data-delivery-fee]");
+        if (summary) lastDeliveryFee = parseFloat(summary.dataset.deliveryFee);
+    })();
+    function handleFreeDeliveryUpdate(subtotal, deliveryFee) {
+        if (subtotal == null || deliveryFee == null) return;
+        const hintEl = document.getElementById("freeDeliveryHint");
+        const threshold = window.V1_FREE_DELIVERY_THRESHOLD || 0;
+        if (hintEl) {
+            const remaining = threshold - subtotal;
+            if (remaining > 0) {
+                hintEl.textContent = "Add ₹" + Math.ceil(remaining) + " more for free delivery";
+                hintEl.hidden = false;
+            } else {
+                hintEl.hidden = true;
+            }
+        }
+        const nowFree = deliveryFee <= 0 && subtotal > 0;
+        if (lastDeliveryFee !== null && lastDeliveryFee > 0 && nowFree) {
+            showToast("You've unlocked FREE delivery on this order!", "success");
+        }
+        lastDeliveryFee = deliveryFee;
+    }
+
+// ── Draggable floating buttons (WhatsApp / Call) ────────────
+    function makeDraggable(el, storageKey) {
+        if (!el) return;
+
+        // Restore saved position
+        const saved = JSON.parse(localStorage.getItem(storageKey) || "null");
+        if (saved) {
+            el.style.left = saved.left + "px";
+            el.style.top = saved.top + "px";
+            el.style.right = "auto";
+            el.style.bottom = "auto";
+        }
+
+        let dragging = false;
+        let moved = false;
+        let startX, startY, startLeft, startTop;
+
+        const onPointerDown = (e) => {
+            dragging = true;
+            moved = false;
+            const rect = el.getBoundingClientRect();
+            startX = e.clientX;
+            startY = e.clientY;
+            startLeft = rect.left;
+            startTop = rect.top;
+            el.style.left = startLeft + "px";
+            el.style.top = startTop + "px";
+            el.style.right = "auto";
+            el.style.bottom = "auto";
+            el.setPointerCapture(e.pointerId);
+        };
+
+        const onPointerMove = (e) => {
+            if (!dragging) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+            if (!moved) return;
+
+            let newLeft = startLeft + dx;
+            let newTop = startTop + dy;
+
+            // Keep within viewport bounds
+            const maxLeft = window.innerWidth - el.offsetWidth;
+            const maxTop = window.innerHeight - el.offsetHeight;
+            newLeft = Math.min(Math.max(0, newLeft), maxLeft);
+            newTop = Math.min(Math.max(0, newTop), maxTop);
+
+            el.style.left = newLeft + "px";
+            el.style.top = newTop + "px";
+        };
+
+        const onPointerUp = (e) => {
+            if (!dragging) return;
+            dragging = false;
+            el.releasePointerCapture(e.pointerId);
+
+            if (moved) {
+                // Prevent the click/navigation that follows a drag
+                const suppressClick = (ev) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    el.removeEventListener("click", suppressClick, true);
+                };
+                el.addEventListener("click", suppressClick, true);
+
+                const rect = el.getBoundingClientRect();
+                localStorage.setItem(storageKey, JSON.stringify({ left: rect.left, top: rect.top }));
+            }
+        };
+
+        el.addEventListener("pointerdown", onPointerDown);
+        el.addEventListener("pointermove", onPointerMove);
+        el.addEventListener("pointerup", onPointerUp);
+        el.addEventListener("pointercancel", onPointerUp);
+    }
+
+    makeDraggable(document.querySelector(".float-whatsapp"), "v1fresh_whatsapp_pos");
+
 // ── Mobile nav toggle ──────────────────────────────────────
     const toggle = document.getElementById("mobileToggle");
     const navbarInner = document.querySelector(".navbar-inner");
@@ -9,6 +132,170 @@ document.addEventListener("DOMContentLoaded", () => {
             navbarInner.classList.toggle("nav-open");
         });
     }
+
+    // ── User account dropdown ──────────────────────────────────
+    const userBtn = document.getElementById("navUserBtn");
+    const userMenu = document.getElementById("navUserMenu");
+    if (userBtn && userMenu) {
+        userBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const willOpen = userMenu.hidden;
+            userMenu.hidden = !willOpen;
+            userBtn.setAttribute("aria-expanded", String(willOpen));
+        });
+        document.addEventListener("click", (e) => {
+            if (!userMenu.hidden && !userMenu.contains(e.target) && e.target !== userBtn) {
+                userMenu.hidden = true;
+                userBtn.setAttribute("aria-expanded", "false");
+            }
+        });
+    }
+
+    // ── Product cards: click anywhere to open detail page ──────
+    document.body.addEventListener("click", (e) => {
+        const card = e.target.closest(".product-card[data-href]");
+        if (!card) return;
+        // Don't hijack clicks on interactive elements inside the card —
+        // links, buttons, and the weight-chip selector handle themselves.
+        if (e.target.closest("a, button, .weight-chip")) return;
+        window.location.href = card.dataset.href;
+    });
+
+    // ── Product carousels: looping next/prev arrows (no free scroll) ──
+    document.querySelectorAll(".carousel:not(.carousel-cylinder)").forEach((carousel) => {
+        const track = carousel.querySelector(".carousel-track");
+        const prev = carousel.querySelector(".carousel-prev");
+        const next = carousel.querySelector(".carousel-next");
+        if (!track) return;
+        const step = () => {
+            const card = track.querySelector(".product-card, .product-grid > *");
+            if (!card) return track.clientWidth * 0.9;
+            const gap = parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap || "0") || 0;
+            return card.getBoundingClientRect().width + gap;
+        };
+        const maxScroll = () => track.scrollWidth - track.clientWidth;
+        if (next) next.addEventListener("click", () => {
+            if (track.scrollLeft >= maxScroll() - 4) {
+                track.scrollTo({ left: 0, behavior: "smooth" });        // loop back to the first
+            } else {
+                track.scrollBy({ left: step(), behavior: "smooth" });
+            }
+        });
+        if (prev) prev.addEventListener("click", () => {
+            if (track.scrollLeft <= 4) {
+                track.scrollTo({ left: maxScroll(), behavior: "smooth" }); // loop to the last
+            } else {
+                track.scrollBy({ left: -step(), behavior: "smooth" });
+            }
+        });
+    });
+
+    // ── "Cylinder" carousel (Seasonal Picks): no free drag/swipe scroll —
+    // arrows rotate the cards endlessly in both directions. Implemented by
+    // sliding the track exactly one card-width, then — once the slide has
+    // finished — silently moving the edge card to the opposite end and
+    // resetting the transform to 0 (no transition), so the same set of
+    // cards keeps circling around forever like a rotating drum.
+    document.querySelectorAll(".carousel-cylinder").forEach((carousel) => {
+        const track = carousel.querySelector(".carousel-track");
+        const prev = carousel.querySelector(".carousel-prev");
+        const next = carousel.querySelector(".carousel-next");
+        if (!track) return;
+
+        const cards = () => Array.from(track.children).filter((el) => el.nodeType === 1 && !el.classList.contains("empty-note"));
+        if (cards().length < 2) return; // nothing to rotate
+
+        let isAnimating = false;
+
+        function stepWidth() {
+            const first = cards()[0];
+            const rect = first.getBoundingClientRect();
+            const gap = parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap || "20") || 20;
+            return rect.width + gap;
+        }
+
+        // `transitionend` isn't 100% guaranteed to fire — a transition can get
+        // silently interrupted (e.g. hovering a card triggers its own
+        // hover-transform layout recalc mid-slide, or the tab is backgrounded
+        // for a moment). If that ever happens, `isAnimating` would stay stuck
+        // `true` forever and the arrows would go dead permanently. A fallback
+        // timer guarantees the rotation always completes and the lock always
+        // releases, no matter what the browser does with the real event.
+        const TRANSITION_MS = 350;
+        const SAFETY_MS = TRANSITION_MS + 150;
+
+        function runOnce(track, fn) {
+            let done = false;
+            return () => {
+                if (done) return;
+                done = true;
+                fn();
+            };
+        }
+
+        function goNext() {
+            if (isAnimating) return;
+            isAnimating = true;
+            const dist = stepWidth();
+            track.style.transition = "transform " + TRANSITION_MS + "ms ease";
+            track.style.transform = "translateX(-" + dist + "px)";
+
+            const finish = runOnce(track, () => {
+                track.removeEventListener("transitionend", onEnd);
+                clearTimeout(safety);
+                track.style.transition = "none";
+                track.appendChild(cards()[0]); // first card rotates to the end
+                track.style.transform = "translateX(0)";
+                // Force a reflow so the "no transition" reset applies before
+                // the next click re-enables the transition.
+                void track.offsetHeight;
+                isAnimating = false;
+            });
+            const onEnd = (e) => { if (e.target === track && e.propertyName === "transform") finish(); };
+            track.addEventListener("transitionend", onEnd);
+            const safety = setTimeout(finish, SAFETY_MS);
+        }
+
+        function goPrev() {
+            if (isAnimating) return;
+            isAnimating = true;
+            const dist = stepWidth();
+
+            // Move the last card to the front first, instantly, pre-offset
+            // by one card-width to the left so nothing visibly jumps —
+            // then animate back to translateX(0) to reveal it sliding in.
+            track.style.transition = "none";
+            const last = cards()[cards().length - 1];
+            track.insertBefore(last, track.firstChild);
+            track.style.transform = "translateX(-" + dist + "px)";
+            void track.offsetHeight;
+
+            requestAnimationFrame(() => {
+                track.style.transition = "transform " + TRANSITION_MS + "ms ease";
+                track.style.transform = "translateX(0)";
+                const finish = runOnce(track, () => {
+                    track.removeEventListener("transitionend", onEnd);
+                    clearTimeout(safety);
+                    isAnimating = false;
+                });
+                const onEnd = (e) => { if (e.target === track && e.propertyName === "transform") finish(); };
+                track.addEventListener("transitionend", onEnd);
+                const safety = setTimeout(finish, SAFETY_MS);
+            });
+        }
+
+        if (next) next.addEventListener("click", goNext);
+        if (prev) prev.addEventListener("click", goPrev);
+
+        // Keep the rotation math correct if the viewport is resized
+        // (card width changes at the 900px breakpoint).
+        window.addEventListener("resize", () => {
+            if (!isAnimating) {
+                track.style.transition = "none";
+                track.style.transform = "translateX(0)";
+            }
+        });
+    });
     // ── Hide topbar on scroll ───────────────────────────────────
 const siteHeader = document.getElementById("siteHeader");
 const topbarEl = siteHeader ? siteHeader.querySelector(".topbar") : null;
@@ -126,6 +413,7 @@ if (topbarEl) {
             else delete window.V1_CART[key];
             renderCardControl(control, data.quantity);
             updateBadge(data.cart_count);
+            handleFreeDeliveryUpdate(data.subtotal, data.delivery_fee);
         } catch (e) { /* network error — ignore */ }
     }
     // Reflect existing cart quantities on load.
@@ -186,6 +474,7 @@ if (topbarEl) {
 
             if (data.ok) {
                 updateBadge(data.cart_count);
+                handleFreeDeliveryUpdate(data.subtotal, data.delivery_fee);
                 btn.textContent = "✓ Added";
                 btn.style.background = "var(--green-700)";
                 setTimeout(() => {
@@ -209,6 +498,42 @@ if (topbarEl) {
         }
     });
 
+    // ── Login-required popup (checkout / wishlist while signed out) ────
+    function showLoginPrompt(message, nextPath) {
+        const modal = document.getElementById("loginPromptModal");
+        if (!modal) {
+            window.location.href = "/login" + (nextPath ? "?next=" + encodeURIComponent(nextPath) : "");
+            return;
+        }
+        const msgEl = document.getElementById("loginPromptMsg");
+        if (msgEl && message) msgEl.textContent = message;
+        const btn = document.getElementById("loginPromptBtn");
+        if (btn) btn.href = "/login?next=" + encodeURIComponent(nextPath || window.location.pathname);
+        modal.hidden = false;
+        document.body.classList.add("modal-open");
+    }
+    function hideLoginPrompt() {
+        const modal = document.getElementById("loginPromptModal");
+        if (modal) modal.hidden = true;
+        document.body.classList.remove("modal-open");
+    }
+    document.body.addEventListener("click", (e) => {
+        if (e.target.closest("[data-action='close-login-modal']")) { hideLoginPrompt(); return; }
+        if (e.target.id === "loginPromptModal") { hideLoginPrompt(); return; }
+    });
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") hideLoginPrompt();
+    });
+
+    // "Proceed to Checkout" while signed out → popup instead of navigating.
+    document.body.addEventListener("click", (e) => {
+        const checkoutLink = e.target.closest("[data-action='checkout-link']");
+        if (checkoutLink && !window.V1_LOGGED_IN) {
+            e.preventDefault();
+            showLoginPrompt("Please sign in to proceed to checkout.", "/checkout");
+        }
+    });
+
     // ── Wishlist (persisted in localStorage) ───────────────────────────
     function getWishlist() {
         try { return JSON.parse(localStorage.getItem("v1fresh_wishlist") || "[]"); }
@@ -219,8 +544,20 @@ if (topbarEl) {
         const badge = document.getElementById("wishlistBadge");
         if (badge) {
             badge.textContent = ids.length;
-            badge.style.display = ids.length ? "" : "none";
+            badge.style.display = ids.length ? "inline-flex" : "none";
         }
+        // Also persist to the signed-in user's account.
+        if (window.V1_LOGGED_IN) {
+            fetch("/wishlist/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids: ids }) }).catch(function () {});
+        }
+    }
+    // Merge the account wishlist (loaded at login) into this browser's list.
+    if (window.V1_WISHLIST_SAVED && window.V1_WISHLIST_SAVED.length) {
+        try {
+            const local = getWishlist();
+            const merged = Array.from(new Set(local.concat(window.V1_WISHLIST_SAVED.map(String))));
+            localStorage.setItem("v1fresh_wishlist", JSON.stringify(merged));
+        } catch (e) {}
     }
     // Restore heart state + badge on every page load.
     (function restoreWishlist() {
@@ -238,8 +575,12 @@ if (topbarEl) {
     document.body.addEventListener("click", (e) => {
         const wishlistBtn = e.target.closest("[data-action='wishlist']");
         if (wishlistBtn) {
+            if (!window.V1_LOGGED_IN) {
+                showLoginPrompt("Please sign in to save items to your wishlist.", window.location.pathname);
+                return;
+            }
             const card = wishlistBtn.closest(".product-card");
-            const id = card ? card.dataset.productId : null;
+            const id = wishlistBtn.dataset.productId || (card ? card.dataset.productId : null);
             if (id) {
                 let ids = getWishlist();
                 if (ids.includes(id)) {
@@ -410,6 +751,7 @@ if (topbarEl) {
         if (subtotalEl) subtotalEl.textContent = "₹" + Math.round(data.subtotal);
         if (deliveryEl) deliveryEl.textContent = data.delivery_fee > 0 ? "₹" + Math.round(data.delivery_fee) : "FREE";
         if (totalEl) totalEl.textContent = "₹" + Math.round(data.total);
+        handleFreeDeliveryUpdate(data.subtotal, data.delivery_fee);
     }
 
     // ── Live location: detect user's area via browser geolocation ──

@@ -1,4 +1,4 @@
-<div class="product-card" data-product-id="{{ product.id }}">
+<div class="product-card" data-product-id="{{ product.id }}" data-href="{{ url_for('products.detail', slug=product.slug) }}">
     {% if product.discount_percent > 0 or product.is_organic or (product.season and product.season != 'all-season') %}
     <div class="card-badges">
         {% if product.discount_percent > 0 %}<span class="badge badge-discount">{{ product.discount_percent }}% OFF</span>{% endif %}

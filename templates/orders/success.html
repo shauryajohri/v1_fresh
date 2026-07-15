@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Order Placed - v1fresh{% endblock %}
+{% block content %}
+<section class="container" style="padding:48px 0; max-width:640px;">
+    <h1 style="margin-bottom:6px;">🎉 Order placed!</h1>
+    <p class="muted">Thank you, {{ order.name }}. Your order is confirmed.</p>
+
+    <div class="order-success-card">
+        <div class="checkout-item"><span>Order number</span><strong>{{ order.order_number }}</strong></div>
+        <div class="checkout-item"><span>Payment</span><span>{{ order.payment_method }}</span></div>
+        <div class="checkout-item"><span>Deliver to</span><span>{{ order.address_line1 }}, {{ order.city }} {{ order.pincode }}</span></div>
+        <hr>
+        {% for it in order.items %}
+        <div class="checkout-item"><span>{{ it.product_name.split('(')[0].strip() }} <small>({{ it.unit }}) × {{ it.quantity }}</small></span><span>₹{{ "%.0f"|format(it.line_total) }}</span></div>
+        {% endfor %}
+        <div class="checkout-item checkout-total"><span>Total</span><span>₹{{ "%.0f"|format(order.total) }}</span></div>
+    </div>
+
+    <a href="{{ url_for('main.home') }}" class="btn btn-primary" style="margin-top:20px;">Continue shopping</a>
+</section>
+{% endblock %}

@@ -8,7 +8,7 @@
     <meta name="theme-color" content="#16a34a">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='20260713m') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='20260715d') }}">
     {% block extra_head %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
@@ -48,23 +48,37 @@
             </form>
             <div class="navbar-actions">
                 {% if current_user %}
-                <div class="nav-user">
-                    {% if current_user.picture %}
-                    <img src="{{ current_user.picture }}" alt="{{ current_user.name }}" class="nav-user-avatar" referrerpolicy="no-referrer">
-                    {% endif %}
-                    <span class="nav-user-name">{{ current_user.given_name or current_user.name }}</span>
-                    <a href="{{ url_for('auth.logout') }}" class="nav-user-logout" title="Log out">Logout</a>
+                <div class="nav-user" id="navUser">
+                    <button type="button" class="nav-user-btn" id="navUserBtn" aria-haspopup="true" aria-expanded="false">
+                        {% if current_user.picture %}
+                        <img src="{{ current_user.picture }}" alt="{{ current_user.name }}" class="nav-user-avatar" referrerpolicy="no-referrer">
+                        {% else %}
+                        <span class="nav-user-avatar nav-user-avatar-fallback">{{ (current_user.name or 'U')[0]|upper }}</span>
+                        {% endif %}
+                        <span class="nav-user-name">{{ current_user.given_name or current_user.name }}</span>
+                        <svg class="nav-user-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div class="nav-user-menu" id="navUserMenu" hidden>
+                        <a href="{{ url_for('main.wishlist') }}" class="nav-user-menu-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6c-1.8-1.8-4.7-1.8-6.5 0L12 6.9l-2.3-2.3c-1.8-1.8-4.7-1.8-6.5 0-1.8 1.8-1.8 4.7 0 6.5L12 20.3l8.8-8.8c1.8-1.8 1.8-4.7 0-6.5z"/></svg>
+                            My Wishlist <span class="nav-menu-badge" id="wishlistBadge">0</span>
+                        </a>
+                        <a href="{{ url_for('orders.my_orders') }}" class="nav-user-menu-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                            Order History
+                        </a>
+                        <a href="{{ url_for('auth.logout') }}" class="nav-user-menu-item nav-user-menu-logout">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>
+                            Logout
+                        </a>
+                    </div>
                 </div>
                 {% else %}
-                <a href="{{ url_for('auth.login') }}" class="nav-icon-link" title="Sign in with Google">
+                <a href="{{ url_for('auth.login') }}" class="nav-icon-link" title="Sign in">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     <span class="nav-icon-label">Login</span>
                 </a>
                 {% endif %}
-                <a href="{{ url_for('main.wishlist') }}" class="nav-icon-link nav-icon-box wishlist-link" id="wishlistNav" title="Wishlist">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.8 4.6c-1.8-1.8-4.7-1.8-6.5 0L12 6.9l-2.3-2.3c-1.8-1.8-4.7-1.8-6.5 0-1.8 1.8-1.8 4.7 0 6.5L12 20.3l8.8-8.8c1.8-1.8 1.8-4.7 0-6.5z"/></svg>
-                    <span class="wishlist-badge" id="wishlistBadge">0</span>
-                </a>
                 <a href="{{ url_for('cart.view_cart') }}" class="nav-icon-link nav-icon-box cart-link" title="Cart">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
                     Cart
@@ -213,13 +227,28 @@
         <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.6.8-.8 1-.1.2-.3.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.2 0-.4.1-.5l.4-.4c.1-.1.2-.3.2-.4 0-.1 0-.3 0-.4-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.4c.1.2 1.6 2.4 3.8 3.4.5.2.9.4 1.3.5.5.2 1 .1 1.4.1.4-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1-.1-.1-.2-.1-.4-.2z"/></svg>
     </a>
 
-    <a href="tel:+919643551177" class="float-call">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.61 21 3 13.39 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.58a1 1 0 0 1-.25 1.02z"/></svg>
-        tel:+919643551177
-    </a>
+    <div id="loginPromptModal" class="modal-overlay" hidden>
+        <div class="modal-box">
+            <button type="button" class="modal-close" data-action="close-login-modal" aria-label="Close">✕</button>
+            <div class="modal-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <h3>Please sign in</h3>
+            <p id="loginPromptMsg">You need to be signed in to do that.</p>
+            <a id="loginPromptBtn" href="{{ url_for('auth.login') }}" class="btn btn-primary btn-full">Sign In</a>
+            <button type="button" class="modal-cancel" data-action="close-login-modal">Cancel</button>
+        </div>
+    </div>
 
-    <script>window.V1_CART = {{ cart | tojson }};</script>
-    <script src="{{ url_for('static', filename='js/main.js', v='20260713m') }}"></script>
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+    <script>
+        window.V1_CART = {{ cart | tojson }};
+        window.V1_WISHLIST_SAVED = {{ user_wishlist | tojson }};
+        window.V1_LOGGED_IN = {{ 'true' if current_user else 'false' }};
+        window.V1_FREE_DELIVERY_THRESHOLD = {{ free_delivery_threshold | tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='js/main.js', v='20260715c') }}"></script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

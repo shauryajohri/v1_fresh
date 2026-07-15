@@ -1,0 +1,46 @@
+{% extends "admin/_base.html" %}
+{% block title %}{{ user.name }} · Customer · Admin{% endblock %}
+{% block admin_content %}
+<div class="admin-header-row">
+    <h1>Customer</h1>
+    <a href="{{ url_for('admin.customers') }}" class="btn btn-ghost">← All customers</a>
+</div>
+
+<div class="admin-content admin-content-full">
+    <div class="admin-customer-card">
+        {% if user.picture %}<img src="{{ user.picture }}" class="admin-customer-avatar" referrerpolicy="no-referrer">{% endif %}
+        <div>
+            <h2 class="admin-customer-name">{{ user.name }}</h2>
+            <p class="admin-customer-meta">{{ user.email or "—" }}{% if user.phone %} · {{ user.phone }}{% endif %}</p>
+            <p class="admin-customer-meta">Member since {{ user.created_at.strftime('%d %b %Y') if user.created_at else "—" }}</p>
+        </div>
+        <div class="admin-customer-stats">
+            <div><strong>{{ orders|length }}</strong><span>orders</span></div>
+            <div><strong>₹{{ "%.0f"|format(total_spent) }}</strong><span>total spent</span></div>
+        </div>
+    </div>
+
+    <h3 class="admin-section-title">Order history</h3>
+    {% if not orders %}
+    <p class="admin-empty" style="padding:24px 0;">No orders yet.</p>
+    {% else %}
+    {% for order in orders %}
+    <div class="admin-order">
+        <div class="admin-order-head">
+            <span><strong>{{ order.order_number }}</strong> · {{ order.created_at.strftime('%d %b %Y, %I:%M %p') if order.created_at else "" }}</span>
+            <span class="admin-order-total">₹{{ "%.2f"|format(order.total) }}</span>
+        </div>
+        <div class="admin-order-items">
+            {% for it in order.items %}
+            <div class="admin-order-item">
+                <span>{{ it.product_name.split('(')[0].strip() }} <small>({{ it.unit }}) × {{ it.quantity }}</small></span>
+                <span>₹{{ "%.2f"|format(it.line_total) }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="admin-order-foot">{{ order.status }} · {{ order.payment_method }}</div>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

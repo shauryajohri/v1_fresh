@@ -63,12 +63,14 @@
             <a href="{{ url_for('products.listing', season=current_season) }}" class="see-all">Shop all →</a>
         </div>
 
-        <div class="product-grid">
-            {% for product in seasonal_products %}
-                {% include "partials/_product_card.html" %}
-            {% else %}
-                <p class="empty-note">No seasonal picks tagged yet for this season.</p>
-            {% endfor %}
+        <div class="carousel carousel-cylinder">
+            <div class="product-grid carousel-track">
+                {% for product in seasonal_products %}
+                    {% include "partials/_product_card.html" %}
+                {% else %}
+                    <p class="empty-note">No seasonal picks tagged yet for this season.</p>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </section>
@@ -85,7 +87,8 @@
                 'vegetables': '🥬',
                 'leafy-greens': '🌿',
                 'exotic': '🥑',
-                'dairy-eggs': '🥚'
+                'dairy-eggs': '🥚',
+                'herbs-spices': '🌶️'
             } %}
             {% for cat in categories %}
             <a href="{{ url_for('products.listing', category=cat.slug) }}" class="category-card">
@@ -111,10 +114,14 @@
             </div>
             <a href="{{ url_for('products.listing', category=spotlight.category.slug) }}" class="see-all">View all →</a>
         </div>
-        <div class="product-grid product-grid-compact">
-            {% for product in spotlight.products %}
-                {% include "partials/_product_card.html" %}
-            {% endfor %}
+        <div class="carousel">
+            <button type="button" class="carousel-arrow carousel-prev" aria-label="Scroll left">‹</button>
+            <div class="product-grid product-grid-compact carousel-track">
+                {% for product in spotlight.products %}
+                    {% include "partials/_product_card.html" %}
+                {% endfor %}
+            </div>
+            <button type="button" class="carousel-arrow carousel-next" aria-label="Scroll right">›</button>
         </div>
     </div>
 </section>
@@ -130,10 +137,14 @@
             </div>
             <a href="{{ url_for('products.listing') }}" class="see-all">Shop all →</a>
         </div>
-        <div class="product-grid product-grid-compact">
-            {% for product in featured_products %}
-                {% include "partials/_product_card.html" %}
-            {% endfor %}
+        <div class="carousel">
+            <button type="button" class="carousel-arrow carousel-prev" aria-label="Scroll left">‹</button>
+            <div class="product-grid product-grid-compact carousel-track">
+                {% for product in featured_products %}
+                    {% include "partials/_product_card.html" %}
+                {% endfor %}
+            </div>
+            <button type="button" class="carousel-arrow carousel-next" aria-label="Scroll right">›</button>
         </div>
     </div>
 </section>
