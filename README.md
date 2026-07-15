@@ -99,3 +99,8 @@ v1fresh/
 - **Phase 2** — working cart (add/update/remove via session), search
 - **Phase 3** — checkout form, order placement, order tracking by order number + phone
 - **Phase 4** — responsive polish, empty/error states, final pass
+
+
+for admin feature use admin in url
+username: shaurya johri
+password: sai@2006
