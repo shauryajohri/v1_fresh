@@ -1,0 +1,217 @@
+====================================================================
+ v1fresh — HOW TO RUN THIS PROJECT (XAMPP + MySQL + phpMyAdmin)
+====================================================================
+
+WHAT THIS PROJECT IS
+---------------------
+A Flask (Python) grocery-delivery website. Data (products, categories,
+orders, customer accounts, admin logins) is stored in a MySQL database
+run by XAMPP, so you can see/edit everything in phpMyAdmin.
+
+
+--------------------------------------------------------------------
+1) ONE-TIME SETUP
+--------------------------------------------------------------------
+
+a) Install XAMPP (if not already installed) and open the XAMPP
+   Control Panel. Start the "Apache" and "MySQL" modules (both
+   should turn green).
+
+b) Open phpMyAdmin in your browser:
+       http://localhost/phpmyadmin
+
+c) Create the database (only needs to be done once):
+   - Click "New" in the left sidebar.
+   - Database name:  v1fresh   (exact spelling, lowercase)
+   - Leave collation as default.
+   - Click "Create".
+   - You do NOT need to create any tables — the app creates them
+     automatically the first time it runs.
+
+d) Open a terminal / PowerShell in the project folder:
+       cd path\to\v1fresh_dup-main
+
+e) (Recommended) Create a virtual environment:
+       Windows:    python -m venv venv  &&  venv\Scripts\activate
+       Mac/Linux:  python3 -m venv venv  &&  source venv/bin/activate
+
+f) Install all required Python packages:
+       pip install -r requirements.txt
+
+   This installs Flask, Flask-SQLAlchemy, PyMySQL (the MySQL driver),
+   and everything else the app needs.
+
+
+--------------------------------------------------------------------
+2) LOAD / RESET THE DATABASE WITH SAMPLE DATA
+--------------------------------------------------------------------
+
+Run:
+       python seed.py
+
+What this does automatically:
+  - Connects to the "v1fresh" MySQL database (via XAMPP).
+  - Creates every table if it doesn't exist yet: categories, products,
+    orders, order_items, users, admins.
+  - Creates one default admin login (see Section 4 below).
+  - Wipes and repopulates "categories" and "products" with sample
+    Indian grocery data (fruits, vegetables, dairy, etc).
+
+After it finishes, refresh phpMyAdmin (http://localhost/phpmyadmin) —
+you'll see the "v1fresh" database in the sidebar with all the tables
+and rows filled in.
+
+You can re-run "python seed.py" any time to reset products/categories
+back to the sample data (it will NOT wipe orders, users, or admins).
+
+
+--------------------------------------------------------------------
+3) RUN THE WEBSITE
+--------------------------------------------------------------------
+
+Run:
+       python app.py
+
+Then open your browser to:
+       http://localhost:5000
+
+Leave the terminal window open — closing it stops the server.
+To stop the server manually, press Ctrl+C in the terminal.
+
+IMPORTANT — always use "localhost:5000", not 127.0.0.1 or your PC's
+network IP (like 192.168.x.x). Google Sign-In only works when opened
+via "localhost" — see Section 6 for why.
+
+
+--------------------------------------------------------------------
+4) ADMIN PANEL LOGIN
+--------------------------------------------------------------------
+
+URL:       http://localhost:5000/admin
+
+Default admin login (auto-created by seed.py / app.py the first time
+the "admins" table is empty):
+       Username:  shaurya
+       Password:  12345
+
+These come from ADMIN_USERNAME / ADMIN_PASSWORD in the ".env" file.
+To change them:
+  - Edit ADMIN_USERNAME and ADMIN_PASSWORD in .env
+  - Then run:  python add_admin.py
+    (this inserts/updates that admin login in the database — editing
+    .env alone does NOT change an admin that already exists in the DB)
+
+The admin panel lets you: view customers and their orders, add/edit/
+delete products, toggle stock, and manage categories.
+
+Admin logins are stored in their OWN "admins" table — completely
+separate from the "users" table (regular customer accounts). A
+customer account can never log into /admin, and vice versa.
+
+
+--------------------------------------------------------------------
+5) VIEWING / EDITING DATA IN phpMyAdmin
+--------------------------------------------------------------------
+
+http://localhost/phpmyadmin  →  click "v1fresh" in the left sidebar.
+
+Tables you'll see:
+  - categories    : product categories (Vegetables, Fruits, etc.)
+  - products       : all products, prices, stock, images
+  - orders          : every order placed by customers
+  - order_items   : line items (which products, quantities) per order
+  - users            : customer accounts (name, email/phone, saved cart)
+  - admins          : admin panel logins (hashed passwords only)
+
+Any order placed on the website, any product added/edited from the
+admin panel, any customer signup — all of it appears here immediately
+after refreshing the page in phpMyAdmin.
+
+
+--------------------------------------------------------------------
+6) GOOGLE SIGN-IN NOTES
+--------------------------------------------------------------------
+
+Google Sign-In only works when you open the site as:
+       http://localhost:5000
+
+It will NOT work via:
+       http://127.0.0.1:5000
+       http://<your-network-ip>:5000   (e.g. 192.168.1.67:5000)
+
+This is a Google security rule (not a bug in this app) — Google only
+allows plain http:// redirects for the exact host "localhost". Opening
+the site from another device on your network (phone, another PC) can
+never use Google Sign-In over plain http — that would require setting
+up HTTPS, which is a bigger separate step.
+
+Everything else (email/password login, phone OTP demo login, browsing,
+cart, checkout, admin panel) works fine regardless of which host/IP
+you use to open the site.
+
+
+--------------------------------------------------------------------
+7) SWITCHING DATABASES (advanced / optional)
+--------------------------------------------------------------------
+
+The database connection is controlled by config.py, which reads the
+DATABASE_URL environment variable if set, otherwise defaults to:
+
+       mysql+pymysql://root:@localhost/v1fresh
+
+To point the app at a different MySQL user/password/host, add this
+line to your .env file:
+
+       DATABASE_URL=mysql+pymysql://<user>:<password>@<host>/v1fresh
+
+To go back to a simple local SQLite file instead of MySQL (no XAMPP
+needed, but you won't see the data in phpMyAdmin):
+
+       DATABASE_URL=sqlite:///v1fresh.db
+
+
+--------------------------------------------------------------------
+8) QUICK TROUBLESHOOTING
+--------------------------------------------------------------------
+
+"ModuleNotFoundError: No module named 'pymysql'"
+  → Run:  pip install PyMySQL==1.1.1
+     (or re-run:  pip install -r requirements.txt)
+
+"Unknown database 'v1fresh'"
+  → You haven't created the database yet. Go to phpMyAdmin → New →
+    name it exactly "v1fresh" → Create. Then re-run seed.py.
+
+"Can't connect to MySQL server"
+  → Open the XAMPP Control Panel and make sure "MySQL" is started
+    (green). Also make sure Apache is running so phpMyAdmin loads.
+
+Google Sign-In gives a redirect_uri / "Error 400" page
+  → Make sure you're opening the site via http://localhost:5000
+    exactly (not 127.0.0.1 or a network IP). See Section 6.
+
+Changes to CSS/styling don't show up in the browser
+  → Hard-refresh the page (Ctrl+Shift+R) to clear the browser's
+    cached copy of the stylesheet.
+
+Forgot the admin password
+  → Edit ADMIN_USERNAME / ADMIN_PASSWORD in .env, then run:
+       python add_admin.py
+
+
+--------------------------------------------------------------------
+9) DAILY WORKFLOW SUMMARY (once initial setup is done)
+--------------------------------------------------------------------
+
+1. Open XAMPP Control Panel → Start Apache + MySQL.
+2. Open a terminal in the project folder, activate the venv if you
+   made one (venv\Scripts\activate on Windows).
+3. Run:  python app.py
+4. Open http://localhost:5000 in your browser.
+5. (Optional) Check/edit data any time at
+   http://localhost/phpmyadmin → v1fresh database.
+6. (Optional) Manage the store at http://localhost:5000/admin
+   using username "shaurya" / password "12345" (or whatever you
+   changed them to).
+
+====================================================================

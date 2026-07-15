@@ -106,6 +106,22 @@ def create_app():
             # the first time some route touches the missing column later.
             logger.exception("Startup DB migration failed — schema may be out of date")
 
+        # Seed the admins table from ADMIN_USERNAME/ADMIN_PASSWORD the first
+        # time it's empty, so admin login has a real (hashed) DB row instead
+        # of comparing plaintext config values on every request.
+        try:
+            from werkzeug.security import generate_password_hash
+            from models import Admin
+            if Admin.query.count() == 0:
+                db.session.add(Admin(
+                    username=app.config["ADMIN_USERNAME"],
+                    password_hash=generate_password_hash(app.config["ADMIN_PASSWORD"]),
+                ))
+                db.session.commit()
+        except Exception:
+            db.session.rollback()
+            logger.exception("Failed to seed default admin account")
+
     return app
 
 

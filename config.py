@@ -35,6 +35,11 @@ class Config:
     # Google OAuth (set these as environment variables on your host / locally)
     GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
     GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
+    # Set this if you deploy behind a real domain — must exactly match one of
+    # the "Authorized redirect URIs" in Google Cloud Console. Left unset for
+    # local dev: routes/auth.py falls back to http://localhost:<port>/auth/callback,
+    # which is the only plain-http host Google allows.
+    GOOGLE_REDIRECT_URI = os.environ.get("GOOGLE_REDIRECT_URI")
 
     # Firebase phone-OTP (client-side). These values are meant to be public
     # (they ship to the browser), so they're safe to expose in the page.

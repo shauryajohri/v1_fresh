@@ -5,9 +5,10 @@ import uuid
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, session
 from werkzeug.utils import secure_filename
+from werkzeug.security import check_password_hash
 
 from extensions import db
-from models import Product, Category
+from models import Product, Category, Admin
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 logger = logging.getLogger(__name__)
@@ -36,9 +37,10 @@ def login():
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
 
-        if (username == current_app.config["ADMIN_USERNAME"]
-                and password == current_app.config["ADMIN_PASSWORD"]):
+        admin = Admin.query.filter_by(username=username).first()
+        if admin and check_password_hash(admin.password_hash, password):
             session["is_admin"] = True
+            session["admin_id"] = admin.id
             next_url = session.pop("admin_next", None)
             flash("Welcome back!", "success")
             return redirect(next_url or url_for("admin.dashboard"))
@@ -51,6 +53,7 @@ def login():
 @admin_bp.route("/logout", methods=["POST"])
 def logout():
     session.pop("is_admin", None)
+    session.pop("admin_id", None)
     flash("Logged out.", "success")
     return redirect(url_for("admin.login"))
 

@@ -63,11 +63,15 @@ ul { list-style: none; margin: 0; padding: 0; }
     width: 100%;
     max-width: 100%;
     margin: 0 auto;
-    padding: 0 16px;
+    padding: 0 32px;
+}
+
+@media (min-width: 1024px) {
+    .container { padding: 0 56px; }
 }
 
 @media (min-width: 1600px) {
-    .container { padding: 0 24px; }
+    .container { padding: 0 96px; }
 }
 
 /* Visible focus state for keyboard nav */
@@ -213,7 +217,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 .nav-user-menu-logout:hover { background: #fef2f2; color: #dc2626; }
 
 /* Checkout + order history + my orders */
-.checkout-page, .myorders-page { padding: 32px 0 60px; }
+.checkout-page, .myorders-page { padding-top: 32px; padding-bottom: 60px; }
 .checkout-layout { display: grid; grid-template-columns: 1.3fr 1fr; gap: 30px; align-items: start; margin-top: 18px; }
 .checkout-form { display: flex; flex-direction: column; gap: 12px; }
 .checkout-form h3, .checkout-summary h3 { margin: 0 0 6px; }
@@ -997,7 +1001,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 /* ===========================================
    Listing page
    =========================================== */
-.listing-page { padding: 36px 0 60px; }
+.listing-page { padding-top: 36px; padding-bottom: 60px; }
 
 .listing-search-wrap { margin-bottom: 20px; }
 .listing-search-wrap input {

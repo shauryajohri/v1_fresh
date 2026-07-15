@@ -198,3 +198,18 @@ class User(db.Model):
 
     def __repr__(self):
         return f"<User {self.email or self.phone}>"
+
+
+class Admin(db.Model):
+    """Store staff/admin-panel logins in their own table, completely separate
+    from the customer-facing `users` table above — a compromised or leaked
+    customer account can never grant access to /admin, and vice versa."""
+    __tablename__ = "admins"
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<Admin {self.username}>"

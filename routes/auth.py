@@ -96,7 +96,18 @@ def google_login():
     if not current_app.config.get("GOOGLE_CLIENT_ID"):
         flash("Google login isn't configured yet (missing GOOGLE_CLIENT_ID).", "error")
         return redirect(url_for("auth.login"))
-    redirect_uri = url_for("auth.callback", _external=True)
+
+    # Google only allows the *exact* redirect URI that's registered in the
+    # Cloud Console, and only accepts plain http:// for the literal host
+    # "localhost" (not 127.0.0.1, and never a LAN IP like 192.168.x.x).
+    # If someone opens the site via 127.0.0.1 or the LAN IP instead of
+    # localhost, url_for(_external=True) would build a mismatched redirect_uri
+    # and Google would reject it — so force it to the registered value.
+    # Override with GOOGLE_REDIRECT_URI in .env if you deploy this elsewhere.
+    redirect_uri = current_app.config.get("GOOGLE_REDIRECT_URI")
+    if not redirect_uri:
+        port = request.host.split(":")[1] if ":" in request.host else "80"
+        redirect_uri = f"http://localhost:{port}/auth/callback"
     return oauth.google.authorize_redirect(redirect_uri)
 
 
