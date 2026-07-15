@@ -23,7 +23,7 @@
         <a href="{{ url_for('products.detail', slug=product.slug) }}" class="product-card-name">{{ base_name }}</a>
         {% if hindi_name %}<span class="product-card-name-hindi">{{ hindi_name }}</span>{% endif %}
 
-        {% set chips = weight_options_for(product.unit) %}
+        {% set chips = weight_options_for(product.unit, slug=product.slug) %}
         {% set default_fraction = chips[0][1] %}
         <div class="weight-chip-row" data-base-price="{{ product.price }}">
             {% for label, fraction in chips %}

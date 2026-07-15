@@ -29,11 +29,22 @@ DETAIL_WEIGHT_OPTIONS = {
     "piece": [("1 pc", 1.0), ("2 pcs", 2.0), ("5 pcs", 5.0)],
 }
 
+# Per-product overrides for products that shouldn't get the full set of chips
+# for their unit (e.g. sugarcane is sold as a single stalk, so it shouldn't
+# offer a "2 pcs" combo the way broccoli/coconut/etc. do). Keyed by slug so
+# it only affects that one product, not every product sharing the same unit.
+PRODUCT_WEIGHT_OVERRIDES = {
+    "sugarcane---ganna-गन्ना": [("1 pc", 1.0)],
+}
 
-def weight_options_for(unit, detail=False):
+
+def weight_options_for(unit, detail=False, slug=None):
     """List of (label, fraction) chips to show for a given product unit.
     Pass detail=True on the product detail page for the extended list
-    (falls back to the normal/compact list if no extended list exists)."""
+    (falls back to the normal/compact list if no extended list exists).
+    Pass slug to apply a per-product override, if one exists."""
+    if slug and slug in PRODUCT_WEIGHT_OVERRIDES:
+        return PRODUCT_WEIGHT_OVERRIDES[slug]
     if detail and unit in DETAIL_WEIGHT_OPTIONS:
         return DETAIL_WEIGHT_OPTIONS[unit]
     return WEIGHT_OPTIONS.get(unit, [(unit, 1.0)])

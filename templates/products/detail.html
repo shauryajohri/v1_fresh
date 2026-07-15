@@ -39,7 +39,7 @@
                 {% endif %}
             </div>
 
-{% set weight_chips = weight_options_for(product.unit, detail=True) %}
+{% set weight_chips = weight_options_for(product.unit, detail=True, slug=product.slug) %}
 {% if weight_chips|length > 1 %}
 <div class="detail-weight-section">
     <span class="detail-weight-label">Select Weight</span>
