@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Services | {{ config.SITE_NAME }}{% endblock %}
+{% block meta_description %}Explore Europack's services: design and engineering assessment, technical support, maintenance, and upgrades.{% endblock %}
+{% block content %}
+<section class="page-header" data-aos="fade-up">
+  <div class="container">
+    <p class="section-eyebrow">Services</p>
+    <h1>Together We Design the Future of Industrial Solutions</h1>
+  </div>
+</section>
+{% include "components/services_cards.html" %}
+{% include "components/cta.html" %}
+{% endblock %}

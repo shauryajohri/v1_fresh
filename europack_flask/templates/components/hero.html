@@ -1,0 +1,13 @@
+<section class="hero" id="home" style="background-image: url('{{ url_for('static', filename='images/hero-bg.jpg') }}');">
+  <div class="hero-overlay"></div>
+  <div class="container hero-content" data-aos="fade-up">
+    <p class="hero-eyebrow">Since 1972</p>
+    <h1 class="hero-title">Supporting the Manufacturing Industry in Greece <span>since 1972</span></h1>
+    <p class="hero-subtitle">Europack offers equipment and extensive technical support to industrial production, helping Greek manufacturers modernize and grow with confidence.</p>
+    <div class="hero-actions">
+      <a href="{{ url_for('main.about') }}" class="btn btn-primary-glass">Learn More</a>
+      <a href="{{ url_for('main.services') }}" class="btn btn-outline-glass">Services</a>
+    </div>
+  </div>
+  <div class="hero-scroll-cue"><i class="fa-solid fa-chevron-down"></i></div>
+</section>

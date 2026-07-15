@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Agencies | {{ config.SITE_NAME }}{% endblock %}
+{% block meta_description %}Europack's agency categories: manufacturing and packaging lines, quality control, and supply chain equipment.{% endblock %}
+{% block content %}
+<section class="page-header" data-aos="fade-up">
+  <div class="container">
+    <p class="section-eyebrow">Agencies</p>
+    <h1>Equipment Categories We Represent</h1>
+  </div>
+</section>
+<section class="agencies-section">
+  <div class="container agencies-grid">
+    <div class="agency-card" id="manufacturing" data-aos="fade-up">
+      <i class="fa-solid fa-industry"></i>
+      <h3>Product Manufacturing &amp; Packaging Lines</h3>
+      <p>Complete lines and standalone machines for forming, filling, sealing, and packing a wide range of industrial and consumer products.</p>
+    </div>
+    <div class="agency-card" id="quality" data-aos="fade-up" data-aos-delay="100">
+      <i class="fa-solid fa-magnifying-glass-chart"></i>
+      <h3>Quality Control</h3>
+      <p>Inspection, checkweighing, and metal detection systems that help manufacturers meet strict quality and safety standards.</p>
+    </div>
+    <div class="agency-card" id="supply-chain" data-aos="fade-up" data-aos-delay="200">
+      <i class="fa-solid fa-truck-ramp-box"></i>
+      <h3>Supply Chain</h3>
+      <p>Palletizing, conveying, and warehouse handling equipment that streamlines the movement of goods from line to logistics.</p>
+    </div>
+  </div>
+</section>
+{% include "components/brands.html" %}
+{% include "components/cta.html" %}
+{% endblock %}

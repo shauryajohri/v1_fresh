@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Company | {{ config.SITE_NAME }}{% endblock %}
+{% block meta_description %}Learn about Europack, supporting Greek manufacturing with industrial equipment and support since 1972.{% endblock %}
+{% block content %}
+<section class="page-header" data-aos="fade-up">
+  <div class="container">
+    <p class="section-eyebrow">Company</p>
+    <h1>Five Decades of Industrial Partnership</h1>
+  </div>
+</section>
+{% include "components/stats.html" %}
+{% include "components/testimonial.html" %}
+{% include "components/cta.html" %}
+{% endblock %}

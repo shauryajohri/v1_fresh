@@ -1,0 +1,17 @@
+<section class="brands-section">
+  <div class="container">
+    <div class="section-heading" data-aos="fade-up">
+      <p class="section-eyebrow">Our Partners</p>
+      <h2>Reliable Quality!</h2>
+    </div>
+    <div class="swiper brands-swiper" data-aos="fade-up">
+      <div class="swiper-wrapper">
+        {% for i in range(1, 13) %}
+        <div class="swiper-slide brand-slide">
+          <img src="{{ url_for('static', filename='images/brand-' ~ i ~ '.png') }}" alt="Brand {{ i }} logo" loading="lazy">
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>

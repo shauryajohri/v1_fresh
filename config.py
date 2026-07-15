@@ -14,7 +14,17 @@ except ImportError:
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
-    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(BASE_DIR, "v1fresh.db")
+
+    # By default this connects to a local MySQL server managed by XAMPP, so the
+    # data is visible/editable in phpMyAdmin (http://localhost/phpmyadmin).
+    # Create an empty database named "v1fresh" in phpMyAdmin first — the app
+    # will create the tables in it automatically on startup.
+    # To go back to the old file-based SQLite db instead, set:
+    #   DATABASE_URL=sqlite:///v1fresh.db
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        "DATABASE_URL",
+        "mysql+pymysql://root:@localhost/v1fresh",
+    )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # If you deploy behind an HTTPS reverse proxy (Render, Railway, etc.), set

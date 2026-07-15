@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ config.SITE_NAME }} | {{ config.SITE_TAGLINE }}{% endblock %}
+{% block content %}
+  {% include "components/hero.html" %}
+  {% include "components/stats.html" %}
+  {% include "components/services_cards.html" %}
+  {% include "components/brands.html" %}
+  {% include "components/testimonial.html" %}
+  {% include "components/cta.html" %}
+{% endblock %}

@@ -67,10 +67,27 @@ def create_app():
     with app.app_context():
         db.create_all()
         # Lightweight dev migration: add newly-added User columns to an existing
-        # 'users' table (SQLite create_all() won't alter existing tables).
+        # 'users' table (create_all() won't alter existing tables).
+        # Works against both SQLite (PRAGMA) and MySQL (information_schema).
         try:
             from sqlalchemy import text
-            existing = {row[1] for row in db.session.execute(text("PRAGMA table_info(users)"))}
+            is_sqlite = db.engine.url.get_backend_name() == "sqlite"
+
+            def existing_columns(table):
+                if is_sqlite:
+                    return {row[1] for row in db.session.execute(text(f"PRAGMA table_info({table})"))}
+                return {
+                    row[0]
+                    for row in db.session.execute(
+                        text(
+                            "SELECT COLUMN_NAME FROM information_schema.columns "
+                            "WHERE table_schema = DATABASE() AND table_name = :t"
+                        ),
+                        {"t": table},
+                    )
+                }
+
+            existing = existing_columns("users")
             if existing:
                 if "picture" not in existing:
                     db.session.execute(text("ALTER TABLE users ADD COLUMN picture VARCHAR(500)"))
@@ -78,7 +95,7 @@ def create_app():
                     db.session.execute(text("ALTER TABLE users ADD COLUMN cart_data TEXT"))
                 if "wishlist_data" not in existing:
                     db.session.execute(text("ALTER TABLE users ADD COLUMN wishlist_data TEXT"))
-            order_cols = {row[1] for row in db.session.execute(text("PRAGMA table_info(orders)"))}
+            order_cols = existing_columns("orders")
             if order_cols and "user_id" not in order_cols:
                 db.session.execute(text("ALTER TABLE orders ADD COLUMN user_id INTEGER"))
             db.session.commit()

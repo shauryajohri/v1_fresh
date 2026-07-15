@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Contact | {{ config.SITE_NAME }}{% endblock %}
+{% block meta_description %}Get in touch with Europack for equipment and support inquiries.{% endblock %}
+{% block content %}
+<section class="page-header" data-aos="fade-up">
+  <div class="container">
+    <p class="section-eyebrow">Contact</p>
+    <h1>Let's Talk About Your Production Line</h1>
+  </div>
+</section>
+<section class="contact-section">
+  <div class="container contact-grid">
+    <div class="contact-info" data-aos="fade-right">
+      <h3>Contact Details</h3>
+      <p><i class="fa-solid fa-phone"></i> {{ config.CONTACT_PHONE }}</p>
+      <p><i class="fa-solid fa-envelope"></i> {{ config.CONTACT_EMAIL }}</p>
+      <p><i class="fa-solid fa-location-dot"></i> Athens, Greece</p>
+    </div>
+    <form class="contact-form" method="POST" action="{{ url_for('main.contact') }}" novalidate data-aos="fade-left">
+      {{ form.hidden_tag() }}
+      <div class="form-group">
+        {{ form.name.label }}
+        {{ form.name(class_="form-control") }}
+        {% for error in form.name.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+      </div>
+      <div class="form-group">
+        {{ form.email.label }}
+        {{ form.email(class_="form-control") }}
+        {% for error in form.email.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+      </div>
+      <div class="form-group">
+        {{ form.phone.label }}
+        {{ form.phone(class_="form-control") }}
+        {% for error in form.phone.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+      </div>
+      <div class="form-group">
+        {{ form.subject.label }}
+        {{ form.subject(class_="form-control") }}
+        {% for error in form.subject.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+      </div>
+      <div class="form-group">
+        {{ form.message.label }}
+        {{ form.message(class_="form-control", rows=5) }}
+        {% for error in form.message.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+      </div>
+      <button type="submit" class="btn btn-primary-glass">Send Message</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

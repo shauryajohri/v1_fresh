@@ -1,0 +1,60 @@
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-col footer-about">
+      <a class="navbar-brand" href="{{ url_for('main.index') }}">
+        <span class="brand-mark">EP</span>
+        <span class="brand-text">{{ config.SITE_NAME }}</span>
+      </a>
+      <p>{{ config.SITE_TAGLINE }}. Supply, design and support of industrial production and packaging equipment.</p>
+      <div class="social-icons">
+        <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href="#" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Useful Links</h4>
+      <ul>
+        <li><a href="{{ url_for('main.index') }}">Home</a></li>
+        <li><a href="{{ url_for('main.about') }}">Company</a></li>
+        <li><a href="{{ url_for('main.services') }}">Services</a></li>
+        <li><a href="#">News</a></li>
+        <li><a href="{{ url_for('main.contact') }}">Contact</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Agencies</h4>
+      <ul>
+        <li><a href="{{ url_for('main.products') }}#manufacturing">Manufacturing &amp; Packaging Lines</a></li>
+        <li><a href="{{ url_for('main.products') }}#quality">Quality Control</a></li>
+        <li><a href="{{ url_for('main.products') }}#supply-chain">Supply Chain</a></li>
+      </ul>
+      <h4>Information</h4>
+      <ul>
+        <li><a href="#">Privacy Policy</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Newsletter</h4>
+      <p>Sign up for news and updates from Europack.</p>
+      <form class="newsletter-form" method="POST" action="{{ url_for('main.newsletter') }}">
+        {{ newsletter_form.hidden_tag() }}
+        {{ newsletter_form.email(class_="newsletter-input", placeholder="Your email address") }}
+        <button type="submit" class="newsletter-btn" aria-label="Subscribe"><i class="fa-solid fa-paper-plane"></i></button>
+      </form>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container footer-bottom-inner">
+      <p>&copy; {{ 2026 }} {{ config.SITE_NAME }}. All rights reserved.</p>
+    </div>
+  </div>
+
+  <button id="backToTop" class="back-to-top" aria-label="Back to top">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
+</footer>

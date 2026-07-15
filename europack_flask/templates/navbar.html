@@ -1,0 +1,33 @@
+<header class="site-navbar" id="siteNavbar">
+  <div class="container navbar-inner">
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">
+      <span class="brand-mark">EP</span>
+      <span class="brand-text">{{ config.SITE_NAME }}</span>
+    </a>
+
+    <nav class="navbar-nav-wrapper" id="navbarNavWrapper">
+      <ul class="navbar-nav">
+        <li><a href="{{ url_for('main.about') }}">Company</a></li>
+        <li><a href="{{ url_for('main.services') }}">Services</a></li>
+        <li class="nav-dropdown">
+          <a href="{{ url_for('main.products') }}" class="dropdown-toggle">Agencies <i class="fa-solid fa-chevron-down"></i></a>
+          <ul class="dropdown-menu-custom">
+            <li><a href="{{ url_for('main.products') }}#manufacturing">Product Manufacturing &amp; Packaging Lines</a></li>
+            <li><a href="{{ url_for('main.products') }}#quality">Quality Control</a></li>
+            <li><a href="{{ url_for('main.products') }}#supply-chain">Supply Chain</a></li>
+          </ul>
+        </li>
+        <li><a href="#">News</a></li>
+        <li class="nav-contact-info">
+          <a href="tel:{{ config.CONTACT_PHONE }}"><i class="fa-solid fa-phone"></i> {{ config.CONTACT_PHONE }}</a>
+          <a href="mailto:{{ config.CONTACT_EMAIL }}"><i class="fa-solid fa-envelope"></i> {{ config.CONTACT_EMAIL }}</a>
+        </li>
+        <li><a class="btn-cta" href="{{ url_for('main.contact') }}">Contact</a></li>
+      </ul>
+    </nav>
+
+    <button class="navbar-toggle" id="navbarToggle" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
